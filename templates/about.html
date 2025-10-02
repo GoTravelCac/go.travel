@@ -1,0 +1,625 @@
+{% extends "base.html" %}
+
+{% block title %}About go.travel - AI-Powered Travel Planning{% endblock %}
+{% block description %}Learn about go.travel's mission to revolutionize travel planning with AI technology. Discover our features, technology stack, and commitment to personalized travel experiences.{% endblock %}
+
+{% block styles %}
+/* About Page Styles */
+.about-header {}
+
+@media (max-width: 1024px) {
+    .mission-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+    
+    .tech-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 2rem;
+    }
+    
+    .features-showcase-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .tech-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .features-showcase-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+}
+
+.about-header {
+    background: linear-gradient(135deg, var(--text-color) 0%, var(--primary-color) 100%);
+    color: var(--white);
+    padding: 5rem 0;
+    text-align: center;
+}
+
+.about-header h1 {
+    font-family: var(--font-heading);
+    font-size: 3.5rem;
+    margin-bottom: 1.5rem;
+    font-weight: 700;
+}
+
+.about-header p {
+    font-size: 1.3rem;
+    opacity: 0.95;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.about-content {
+    padding: 0;
+}
+
+.about-section {
+    padding: 5rem 0;
+}
+
+.about-section:nth-child(even) {
+    background: var(--background-color);
+}
+
+.about-section h2 {
+    font-size: 2.8rem;
+    color: var(--text-color);
+    margin-bottom: 2.5rem;
+    text-align: center;
+    font-weight: 600;
+}
+
+.about-section p {
+    font-size: 1.2rem;
+    line-height: 1.8;
+    color: var(--text-light);
+    max-width: 900px;
+    margin: 0 auto 3rem;
+    text-align: center;
+}
+
+.mission-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2.5rem;
+    margin-top: 4rem;
+}
+
+.mission-card {
+    background: var(--white);
+    padding: 2.5rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-md);
+    text-align: center;
+    transition: all 0.3s ease;
+    border-top: 4px solid var(--primary-color);
+}
+
+.mission-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-lg);
+}
+
+.mission-icon {
+    font-size: 3.5rem;
+    margin-bottom: 1.5rem;
+    display: block;
+}
+
+.mission-card h3 {
+    font-size: 1.6rem;
+    color: var(--text-color);
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+}
+
+.mission-card p {
+    color: var(--text-light);
+    text-align: left;
+    font-size: 1rem;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.tech-stack {
+    background: var(--background-color);
+    padding: 5rem 0;
+}
+
+.tech-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2.5rem;
+    margin-top: 3rem;
+}
+
+.tech-card {
+    background: var(--white);
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-sm);
+    text-align: center;
+    border-left: 5px solid var(--primary-color);
+    transition: all 0.3s ease;
+}
+
+.tech-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+}
+
+.tech-card h4 {
+    color: var(--primary-color);
+    font-size: 1.3rem;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+}
+
+.tech-list {
+    list-style: none;
+    padding: 0;
+}
+
+.tech-list li {
+    color: var(--text-light);
+    margin-bottom: 0.75rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 0.95rem;
+}
+
+.tech-list li:last-child {
+    border-bottom: none;
+}
+
+.features-showcase {
+    background: var(--white);
+    padding: 5rem 0;
+}
+
+.features-showcase-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2.5rem;
+    margin-top: 3rem;
+}
+
+.feature-showcase {
+    background: linear-gradient(135deg, #f0f9ff 0%, #ecfdf5 100%);
+    padding: 2.5rem;
+    border-radius: var(--border-radius);
+    border: 2px solid var(--primary-color);
+    transition: all 0.3s ease;
+}
+
+.feature-showcase:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+}
+
+.feature-showcase-icon {
+    font-size: 3rem;
+    margin-bottom: 1.5rem;
+    display: block;
+}
+
+.feature-showcase h3 {
+    color: var(--primary-color);
+    font-size: 1.7rem;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+}
+
+.feature-showcase p {
+    color: var(--text-light);
+    text-align: left;
+    margin-bottom: 1.5rem;
+    font-size: 1.05rem;
+    line-height: 1.6;
+}
+
+.feature-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.feature-list li {
+    color: var(--text-light);
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    font-size: 0.95rem;
+}
+
+.feature-list li::before {
+    content: "✓";
+    color: var(--accent-color);
+    font-weight: bold;
+    margin-right: 0.75rem;
+    font-size: 1.1rem;
+}
+
+.stats-section {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    color: var(--white);
+    padding: 5rem 0;
+    text-align: center;
+}
+
+.stats-section h2 {
+    color: var(--white);
+    margin-bottom: 2rem;
+}
+
+.stats-section p {
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 3rem;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 3rem;
+    margin-top: 3rem;
+}
+
+.stat-item {
+    text-align: center;
+    padding: 1.5rem;
+}
+
+.stat-number {
+    font-family: var(--font-heading);
+    font-size: 4rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.stat-label {
+    font-size: 1.2rem;
+    opacity: 0.9;
+    font-weight: 500;
+}
+
+.cta-section {
+    background: var(--background-color);
+    padding: 5rem 0;
+    text-align: center;
+}
+
+.cta-content {
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.cta-content h2 {
+    font-size: 2.5rem;
+    color: var(--text-color);
+    margin-bottom: 2rem;
+    font-weight: 600;
+}
+
+.cta-content p {
+    font-size: 1.2rem;
+    color: var(--text-light);
+    line-height: 1.7;
+    margin-bottom: 3rem;
+}
+
+.cta-button {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    color: var(--white);
+    padding: 1.5rem 3rem;
+    text-decoration: none;
+    border-radius: var(--border-radius);
+    font-weight: 600;
+    font-size: 1.3rem;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-lg);
+    position: relative;
+    overflow: hidden;
+}
+
+.cta-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 25px 35px -5px rgb(0 0 0 / 0.15), 0 10px 15px -8px rgb(0 0 0 / 0.1);
+    color: var(--white);
+    text-decoration: none;
+}
+
+.cta-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+}
+
+.cta-button:hover::before {
+    left: 100%;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .about-header {
+        padding: 4rem 0;
+    }
+    
+    .about-header h1 {
+        font-size: 2.8rem;
+    }
+    
+    .about-header p {
+        font-size: 1.1rem;
+    }
+    
+    .about-section {
+        padding: 4rem 0;
+    }
+    
+    .about-section h2 {
+        font-size: 2.2rem;
+    }
+    
+    .about-section p {
+        font-size: 1.1rem;
+    }
+    
+    .mission-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        margin-top: 3rem;
+    }
+    
+    .tech-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 2rem;
+    }
+    
+    .features-showcase-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 2rem;
+    }
+    
+    .mission-card,
+    .feature-showcase {
+        padding: 2rem;
+    }
+    
+    .cta-content h2 {
+        font-size: 2rem;
+    }
+    
+    .cta-button {
+        padding: 1.25rem 2.5rem;
+        font-size: 1.2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .about-header h1 {
+        font-size: 2.4rem;
+    }
+    
+    .about-section h2 {
+        font-size: 2rem;
+    }
+    
+    .mission-card,
+    .tech-card,
+    .feature-showcase {
+        padding: 1.5rem;
+    }
+    
+    .cta-button {
+        display: block;
+        margin: 0 auto;
+        max-width: 280px;
+    }
+}
+{% endblock %}
+
+{% block content %}
+<!-- About Header -->
+<section class="about-header">
+    <div class="container">
+        <h1>About go.travel</h1>
+        <p>Revolutionizing travel planning with the power of artificial intelligence</p>
+    </div>
+</section>
+
+<!-- About Content -->
+<div class="about-content">
+    <!-- Mission Section -->
+    <section class="about-section">
+        <div class="container">
+            <h2>Our Mission</h2>
+            <p>
+                At go.travel, we believe that planning the perfect trip shouldn't be overwhelming or time-consuming. 
+                Our mission is to democratize travel planning by leveraging cutting-edge AI technology to create 
+                personalized, comprehensive itineraries that match your unique preferences, budget, and travel style.
+            </p>
+            
+            <div class="mission-grid">
+                <div class="mission-card">
+                    <div class="mission-icon">🚀</div>
+                    <h3>Innovation</h3>
+                    <p>We harness the latest in AI technology, specifically Google's Gemini 2.0 Flash model, to understand your travel preferences and create unique experiences tailored just for you.</p>
+                </div>
+                <div class="mission-card">
+                    <div class="mission-icon">🌍</div>
+                    <h3>Accessibility</h3>
+                    <p>Travel planning should be accessible to everyone. Our platform provides comprehensive itineraries regardless of your experience level or destination knowledge.</p>
+                </div>
+                <div class="mission-card">
+                    <div class="mission-icon">⚡</div>
+                    <h3>Efficiency</h3>
+                    <p>Generate detailed travel plans in seconds, not hours. Spend less time planning and more time experiencing the joy of travel.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Technology Section -->
+    <section class="tech-stack">
+        <div class="container">
+            <h2>Powered by Advanced Technology</h2>
+            <p>
+                go.travel leverages a sophisticated technology stack to deliver accurate, real-time travel information 
+                and intelligent recommendations. Our platform integrates multiple data sources and APIs to provide 
+                comprehensive travel insights.
+            </p>
+            
+            <div class="tech-grid">
+                <div class="tech-card">
+                    <h4>🤖 Artificial Intelligence</h4>
+                    <ul class="tech-list">
+                        <li>Google Gemini 2.0 Flash</li>
+                        <li>Natural Language Processing</li>
+                        <li>Machine Learning Algorithms</li>
+                        <li>Personalization Engine</li>
+                    </ul>
+                </div>
+                <div class="tech-card">
+                    <h4>🗺️ Mapping & Location</h4>
+                    <ul class="tech-list">
+                        <li>Google Maps JavaScript API</li>
+                        <li>Google Places API</li>
+                        <li>Geocoding Services</li>
+                        <li>Interactive Maps</li>
+                    </ul>
+                </div>
+                <div class="tech-card">
+                    <h4>🌤️ Real-Time Data</h4>
+                    <ul class="tech-list">
+                        <li>OpenWeatherMap API</li>
+                        <li>Google Timezone API</li>
+                        <li>Live Weather Updates</li>
+                        <li>Local Time Calculations</li>
+                    </ul>
+                </div>
+                <div class="tech-card">
+                    <h4>🔧 Backend Infrastructure</h4>
+                    <ul class="tech-list">
+                        <li>Flask Web Framework</li>
+                        <li>RESTful API Design</li>
+                        <li>Secure API Integration</li>
+                        <li>Responsive Frontend</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Showcase -->
+    <section class="features-showcase">
+        <div class="container">
+            <h2>Comprehensive Features</h2>
+            <p>
+                Our platform offers a complete suite of travel planning tools designed to make your trip planning 
+                experience seamless and enjoyable.
+            </p>
+            
+            <div class="features-showcase-grid">
+                <div class="feature-showcase">
+                    <div class="feature-showcase-icon">🎯</div>
+                    <h3>Personalized Itineraries</h3>
+                    <p>AI-generated travel plans tailored to your specific interests, budget, and travel style.</p>
+                    <ul class="feature-list">
+                        <li>Custom duration planning</li>
+                        <li>Budget-conscious recommendations</li>
+                        <li>Interest-based activities</li>
+                        <li>Travel style matching</li>
+                    </ul>
+                </div>
+                <div class="feature-showcase">
+                    <div class="feature-showcase-icon">🗺️</div>
+                    <h3>Interactive Exploration</h3>
+                    <p>Explore destinations with interactive maps and real-time location information.</p>
+                    <ul class="feature-list">
+                        <li>Interactive Google Maps</li>
+                        <li>Location autocomplete</li>
+                        <li>Nearby attractions</li>
+                        <li>Visual destination preview</li>
+                    </ul>
+                </div>
+                <div class="feature-showcase">
+                    <div class="feature-showcase-icon">📱</div>
+                    <h3>Smart Management</h3>
+                    <p>Comprehensive tools to refine, share, and manage your travel itineraries.</p>
+                    <ul class="feature-list">
+                        <li>AI-powered refinement</li>
+                        <li>Easy sharing options</li>
+                        <li>Export capabilities</li>
+                        <li>Email integration</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats-section">
+        <div class="container">
+            <h2>Built for Travelers</h2>
+            <p>Our platform is designed with real travelers in mind, focusing on accuracy, speed, and user experience.</p>
+            
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number">⚡</div>
+                    <div class="stat-label">Instant Generation</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">🌍</div>
+                    <div class="stat-label">Global Coverage</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">🤖</div>
+                    <div class="stat-label">AI-Powered</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">📱</div>
+                    <div class="stat-label">Mobile Optimized</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section class="cta-section">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Ready to Plan Your Next Adventure?</h2>
+                <p>
+                    Join thousands of travelers who have discovered the power of AI-assisted trip planning. 
+                    Create your first personalized itinerary today and experience the future of travel planning.
+                </p>
+                <a href="/planner" class="cta-button">Start Planning Now</a>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}
+
+{% block scripts %}
+// Add any specific JavaScript for the about page here
+{% endblock %}

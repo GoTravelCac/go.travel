@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<!-- Made for the Congressional App Challenge. Made by Nandish Panchal and Snehi Patel -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}go.travel - AI-Powered Travel Itinerary Generator{% endblock %}</title>
+    
+    <!-- Meta Tags for SEO and Social -->
+    <meta name="description" content="{% block description %}Create personalized travel itineraries instantly with AI. Real-time weather, interactive maps, and smart recommendations for your perfect trip.{% endblock %}">
+    <meta name="keywords" content="travel itinerary, AI travel planner, trip planner, travel guide, vacation planner">
+    <meta name="author" content="go.travel">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://gotravel.com/">
+    <meta property="og:title" content="{% block og_title %}go.travel - AI Travel Itinerary Generator{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}Create personalized travel itineraries instantly with AI{% endblock %}">
+    <meta property="og:image" content="/gotravel.png">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://gotravel.com/">
+    <meta property="twitter:title" content="{% block twitter_title %}go.travel - AI Travel Itinerary Generator{% endblock %}">
+    <meta property="twitter:description" content="{% block twitter_description %}Create personalized travel itineraries instantly with AI{% endblock %}">
+    <meta property="twitter:image" content="/gotravel.png">
+    
+    <!-- Favicon -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="/favicon/favicon-96x96.png">
+    <link rel="icon" type="image/svg+xml" href="/favicon/favicon.svg">
+    <link rel="icon" type="image/x-icon" href="/favicon/favicon.ico">
+    <link rel="manifest" href="/favicon/site.webmanifest">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Configuration Script - Load API keys dynamically -->
+    <script>
+        // Global configuration object
+        window.APP_CONFIG = {};
+        
+        // Load configuration from backend
+        fetch('/api/config')
+            .then(response => response.json())
+            .then(config => {
+                window.APP_CONFIG = config;
+                console.log('✅ App configuration loaded');
+                
+                // Load Google Maps API dynamically with the API key
+                if (config.google_maps_api_key) {
+                    const script = document.createElement('script');
+                    script.src = `https://maps.googleapis.com/maps/api/js?key=${config.google_maps_api_key}&libraries=places&callback=initializePage`;
+                    script.async = true;
+                    script.defer = true;
+                    document.head.appendChild(script);
+                }
+            })
+            .catch(error => {
+                console.error('❌ Failed to load app configuration:', error);
+                window.APP_CONFIG = {
+                    google_maps_api_key: null,
+                    backend_url: '',
+                    version: '1.0.0'
+                };
+            });
+    </script>
+    
+    <!-- PDF Library for export functionality -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <style>
+        /* CSS Variables */
+        :root {
+            --primary-color: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary-color: #ec4899;
+            --accent-color: #10b981;
+            --background-color: #f8fafc;
+            --text-color: #1e293b;
+            --text-light: #64748b;
+            --white: #ffffff;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --border-radius: 12px;
+            --font-primary: 'Inter', sans-serif;
+            --font-heading: 'Dancing Script', cursive;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Page scrolling */
+        html {
+            scroll-behavior: auto;
+        }
+
+        body {
+            font-family: var(--font-primary);
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        /* Navigation */
+        .navbar {
+            background: #fefdf2;
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            animation: fadeInUp 0.8s ease-out 0.2s both;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: var(--font-heading);
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            animation: fadeInLeft 0.8s ease-out 0.3s both;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-img {
+            height: 2.5rem;
+            width: auto;
+            transition: all 0.3s ease;
+            border-radius: 8px;
+        }
+
+        .logo:hover {
+            color: var(--secondary-color);
+            transform: scale(1.05);
+        }
+
+        .logo:hover .logo-img {
+            transform: rotate(5deg) scale(1.1);
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            animation: fadeInRight 0.8s ease-out 0.4s both;
+        }
+
+        .nav-menu li {
+            position: relative;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+        }
+
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: var(--primary-color);
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+
+        .nav-link:hover::before,
+        .nav-link.active::before {
+            width: 100%;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: var(--primary-color);
+            background: rgba(99, 102, 241, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .nav-toggle {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+        }
+
+        .nav-toggle span {
+            width: 25px;
+            height: 3px;
+            background: var(--white);
+            margin: 3px 0;
+            transition: 0.3s;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Footer */
+        .footer {
+            background: linear-gradient(135deg, var(--text-color) 0%, #374151 100%);
+            color: var(--white);
+            padding: 3rem 0 1rem;
+            margin-top: 4rem;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section h4 {
+            color: var(--white);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 0.5rem;
+            color: #d1d5db;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid #374151;
+            color: #9ca3af;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-menu {
+                position: fixed;
+                left: -100%;
+                top: 70px;
+                flex-direction: column;
+                background-color: var(--white);
+                width: 100%;
+                text-align: center;
+                transition: 0.3s;
+                box-shadow: var(--shadow-lg);
+                padding: 2rem 0;
+            }
+
+            .nav-menu.active {
+                left: 0;
+            }
+
+            .nav-toggle {
+                display: flex;
+            }
+
+            .container {
+                padding: 0 1rem;
+            }
+        }
+
+        {% block styles %}{% endblock %}
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="logo">
+                <img src="/gotravel.png" alt="go.travel logo" class="logo-img">
+                <span>go.travel</span>
+            </a>
+            <ul class="nav-menu">
+                <li><a href="/" class="nav-link {% if request.endpoint == 'home' %}active{% endif %}">Home</a></li>
+                <li><a href="/planner" class="nav-link {% if request.endpoint == 'planner' %}active{% endif %}">Trip Planner</a></li>
+                <li><a href="/explore" class="nav-link {% if request.endpoint == 'explore' %}active{% endif %}">Explore</a></li>
+                <li><a href="/about" class="nav-link {% if request.endpoint == 'about' %}active{% endif %}">About</a></li>
+            </ul>
+            <div class="nav-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
+                        <img src="/gotravel.png" alt="go.travel logo" style="height: 2rem; width: auto; border-radius: 6px;">
+                        <h4 style="margin: 0;">go.travel</h4>
+                    </div>
+                    <p>AI-powered travel planning made simple. Create personalized itineraries with real-time data and smart recommendations.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="/planner" style="color: inherit; text-decoration: none;">Trip Planner</a></li>
+                        <li><a href="/explore" style="color: inherit; text-decoration: none;">Explore Destinations</a></li>
+                        <li><a href="/about" style="color: inherit; text-decoration: none;">About Us</a></li>
+                        <li><a href="/" style="color: inherit; text-decoration: none;">Home</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Features</h4>
+                    <ul>
+                        <li>🤖 AI-Powered Planning</li>
+                        <li>🗺️ Interactive Maps</li>
+                        <li>🌐 Real-time Weather</li>
+                        <li>📱 Mobile Friendly</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 go.travel - Powered by AI Technology | Made with ❤️ for travelers | By Nandish and Snehi</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        // Mobile navigation toggle
+        const navToggle = document.querySelector('.nav-toggle');
+        const navMenu = document.querySelector('.nav-menu');
+
+        if (navToggle && navMenu) {
+            navToggle.addEventListener('click', () => {
+                navMenu.classList.toggle('active');
+            });
+        }
+
+        // Close mobile menu when clicking on a link
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                if (navMenu) {
+                    navMenu.classList.remove('active');
+                }
+            });
+        });
+
+        // Scroll-triggered animations
+        function initScrollAnimations() {
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -100px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        
+                        // Add staggered animation for grid items
+                        if (entry.target.classList.contains('grid-container')) {
+                            const children = entry.target.children;
+                            Array.from(children).forEach((child, index) => {
+                                setTimeout(() => {
+                                    child.style.opacity = '1';
+                                    child.style.transform = 'translateY(0)';
+                                }, index * 100);
+                            });
+                        }
+                    }
+                });
+            }, observerOptions);
+
+            // Observe elements with animation classes
+            document.querySelectorAll('.animate-on-scroll').forEach(el => {
+                observer.observe(el);
+            });
+
+            // Auto-add animation classes to common elements
+            const elementsToAnimate = [
+                '.mission-card',
+                '.tech-card', 
+                '.feature-showcase',
+                '.destination-card',
+                '.stat-item'
+            ];
+
+            elementsToAnimate.forEach(selector => {
+                document.querySelectorAll(selector).forEach((el, index) => {
+                    el.classList.add('animate-on-scroll');
+                    el.style.animationDelay = `${index * 0.1}s`;
+                    observer.observe(el);
+                });
+            });
+        }
+
+        // Enhanced hover effects
+        function initHoverEffects() {
+            // Add pulse effect to buttons
+            document.querySelectorAll('button, .btn, .cta-button').forEach(btn => {
+                btn.classList.add('pulse-hover');
+            });
+
+            // Add floating effect to icons and emojis
+            document.querySelectorAll('.mission-icon, .feature-showcase-icon, .destination-emoji').forEach(icon => {
+                icon.classList.add('floating');
+            });
+        }
+
+        // Parallax scrolling effect
+        function initParallax() {
+            window.addEventListener('scroll', () => {
+                const scrolled = window.pageYOffset;
+                const parallaxElements = document.querySelectorAll('.parallax');
+                
+                parallaxElements.forEach(element => {
+                    const speed = element.dataset.speed || 0.5;
+                    const yPos = -(scrolled * speed);
+                    element.style.transform = `translateY(${yPos}px)`;
+                });
+            });
+        }
+
+        // Loading animations for images
+        function initImageAnimations() {
+            const images = document.querySelectorAll('img');
+            images.forEach(img => {
+                img.addEventListener('load', () => {
+                    img.style.opacity = '1';
+                    img.style.transform = 'scale(1)';
+                });
+                
+                // Set initial styles
+                img.style.opacity = '0';
+                img.style.transform = 'scale(0.95)';
+                img.style.transition = 'all 0.6s ease';
+            });
+        }
+
+        // Page transition effect - Optimized single overlay
+        function initPageTransitions() {
+            // Create a single, fast transition overlay
+            const overlay = document.createElement('div');
+            overlay.className = 'page-transition-overlay';
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+                z-index: 9999;
+                opacity: 0;
+                visibility: hidden;
+                transition: opacity 0.3s ease;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+                font-size: 1.5rem;
+            `;
+            overlay.innerHTML = `
+                <div style="text-align: center;">
+                    <div class="floating" style="font-size: 2.5rem; margin-bottom: 1rem; animation: float 2s ease-in-out infinite;">✈️</div>
+                    <div style="font-size: 1.8rem; margin-bottom: 0.5rem; font-weight: 600;">go.travel</div>
+                    <div style="font-size: 1rem; opacity: 0.9;">Loading...</div>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+
+            // Show overlay on navigation - fast and smooth
+            document.querySelectorAll('a[href^="/"], a[href^="./"]').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    const href = link.getAttribute('href');
+                    if (href && href !== window.location.pathname && href !== '#' && !href.includes('javascript:')) {
+                        e.preventDefault();
+                        
+                        // Show overlay immediately
+                        overlay.style.opacity = '1';
+                        overlay.style.visibility = 'visible';
+                        
+                        // Navigate after a brief delay (500ms for smooth transition)
+                        setTimeout(() => {
+                            window.location.href = href;
+                        }, 500);
+                    }
+                });
+            });
+        }
+
+        // Initialize all animations when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            // Show initial loading screen only on first visit, but keep transition overlay
+            if (!sessionStorage.getItem('hasVisited')) {
+                showInitialLoading();
+                sessionStorage.setItem('hasVisited', 'true');
+            }
+            
+            initScrollAnimations();
+            initHoverEffects();
+            initParallax();
+            initImageAnimations();
+            initPageTransitions(); // Re-enabled with optimization
+            
+            // Add a small delay to ensure smooth initial animations
+            setTimeout(() => {
+                document.body.style.overflow = 'visible';
+            }, 100);
+        });
+
+        // Initial page loading screen
+        function showInitialLoading() {
+            const loadingScreen = document.createElement('div');
+            loadingScreen.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+                z-index: 10000;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+                font-size: 1.5rem;
+            `;
+            loadingScreen.innerHTML = `
+                <div style="text-align: center;">
+                    <div class="floating" style="font-size: 3rem; margin-bottom: 1.5rem; animation: float 2s ease-in-out infinite;">✈️</div>
+                    <div style="font-size: 2.2rem; margin-bottom: 0.5rem; font-weight: 700; font-family: var(--font-heading);">go.travel</div>
+                    <div style="font-size: 1.2rem; opacity: 0.9;">Welcome aboard...</div>
+                </div>
+            `;
+            document.body.appendChild(loadingScreen);
+            
+            // Hide loading screen after 1 second (further reduced for better UX)
+            setTimeout(() => {
+                loadingScreen.style.opacity = '0';
+                loadingScreen.style.transition = 'opacity 0.4s ease';
+                setTimeout(() => {
+                    loadingScreen.remove();
+                }, 400);
+            }, 1000);
+        }
+
+        // Add typing effect for text
+        function typeWriter(element, text, speed = 50) {
+            let i = 0;
+            element.innerHTML = '';
+            
+            function type() {
+                if (i < text.length) {
+                    element.innerHTML += text.charAt(i);
+                    i++;
+                    setTimeout(type, speed);
+                }
+            }
+            type();
+        }
+
+        {% block scripts %}{% endblock %}
+    </script>
+</body>
+</html>

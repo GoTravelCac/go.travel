@@ -1,0 +1,40 @@
+# go.travel - AI Travel Platform# Logs
+
+*.pyc*.log
+
+__pycache__/npm-debug.log*
+
+.env
+
+*.log# Environment variables
+
+logs/.env
+
+.DS_Store.env.local
+
+node_modules/.env.production
+
+.vscode/
+
+*.tmp# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Temporary files
+*.tmp
+*.temp
+
+# API Keys (additional protection)
+**/api-keys.js
+**/config.local.js
