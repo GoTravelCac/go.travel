@@ -144,95 +144,6 @@
     font-size: 1.25rem;
 }
 
-/* Highlight styles for enhanced content */
-.highlight-gem {
-    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-    color: #92400e;
-    padding: 0.25rem 0.5rem;
-    border-radius: 6px;
-    font-weight: 600;
-    border: 1px solid #f59e0b;
-    display: inline-block;
-    margin: 0.125rem;
-}
-
-.travel-time {
-    background: linear-gradient(135deg, #e0f2fe 0%, #b3e5fc 100%);
-    color: #0d47a1;
-    padding: 0.25rem 0.5rem;
-    border-radius: 6px;
-    font-weight: 600;
-    border: 1px solid #2196f3;
-    display: inline-block;
-    margin: 0.125rem;
-    font-size: 0.9rem;
-}
-
-/* Safety Panel */
-.safety-panel {
-    background: linear-gradient(135deg, #fef2f2 0%, #fecaca 100%);
-    border: 2px solid #ef4444;
-    border-radius: var(--border-radius);
-    padding: 1.5rem;
-    margin: 2rem 0;
-}
-
-.safety-header {
-    text-align: center;
-    margin-bottom: 1.5rem;
-    border-bottom: 2px solid #ef4444;
-    padding-bottom: 1rem;
-}
-
-.safety-header h3 {
-    color: #dc2626;
-    font-size: 1.5rem;
-    margin-bottom: 0.5rem;
-}
-
-.safety-header p {
-    color: #7f1d1d;
-    font-size: 0.9rem;
-    margin: 0;
-}
-
-.safety-content {
-    background: var(--white);
-    padding: 1.5rem;
-    border-radius: 8px;
-    line-height: 1.6;
-    border-left: 4px solid #ef4444;
-}
-
-.safety-content h4 {
-    color: #dc2626;
-    margin: 1rem 0 0.5rem 0;
-    font-size: 1.1rem;
-}
-
-.safety-content ul {
-    margin: 0.5rem 0 1rem 1.5rem;
-}
-
-.safety-content li {
-    margin-bottom: 0.25rem;
-    color: var(--text-color);
-}
-
-.safety-emergency {
-    background: #fee2e2;
-    border: 1px solid #fca5a5;
-    border-radius: 6px;
-    padding: 1rem;
-    margin: 1rem 0;
-}
-
-.safety-emergency h5 {
-    color: #dc2626;
-    margin: 0 0 0.5rem 0;
-    font-size: 1rem;
-}
-
 /* Loading Animation */
 .loading {
     display: flex;
@@ -479,15 +390,6 @@
         </div>
         <div id="itineraryContent" class="itinerary-content"></div>
         
-        <!-- Safety Information Panel -->
-        <div id="safetyPanel" class="safety-panel" style="display: none;">
-            <div class="safety-header">
-                <h3>🛡️ Safety & Security Information</h3>
-                <p>Important safety tips and emergency information for your trip</p>
-            </div>
-            <div id="safetyContent" class="safety-content"></div>
-        </div>
-        
         <!-- Itinerary Management Section -->
         <div id="itineraryManagement" class="itinerary-management" style="display: none;">
             <h3 style="text-align: center; margin-bottom: 1.5rem; color: var(--primary-color);">✏️ Manage Your Itinerary</h3>
@@ -502,7 +404,7 @@
                     <div class="action-buttons">
                         <button class="action-btn secondary" onclick="shareItinerary()">🔗 Share</button>
                         <button class="action-btn secondary" onclick="downloadText()">📄 Download</button>
-                        <button class="action-btn secondary" onclick="emailItinerary()">📧 Email</button>
+                        <button class="action-btn secondary" onclick="copyItinerary()">� Copy</button>
                         <button class="action-btn secondary" onclick="downloadPDF()">📋 PDF</button>
                     </div>
                 </div>
@@ -516,18 +418,7 @@
 // Configuration
 const CONFIG = {
     BACKEND_URL: '',  // Use relative URLs for same-origin requests
-    get GOOGLE_MAPS_API_KEY() {
-        return window.APP_CONFIG?.google_maps_api_key || null;
-    },
-    get APP_NAME() {
-        return window.APP_CONFIG?.app_name || 'go.travel';
-    },
-    get APP_DESCRIPTION() {
-        return window.APP_CONFIG?.app_description || 'AI Travel Planner';
-    },
-    get APP_URL() {
-        return window.APP_CONFIG?.app_url || 'https://gotravel.com';
-    }
+    GOOGLE_MAPS_API_KEY: '{{ google_api_key }}'
 };
 
 // Global variables
@@ -538,43 +429,16 @@ let currentDestination = '';
 
 // Initialize page when Google Maps API is ready
 function initializePage() {
-    console.log('🚀 Initializing planner page...');
-    
     initializeAutocomplete();
     setupDateCalculation();
     
     // Check if destination is pre-filled from URL params
-    setTimeout(() => {
-        const urlParams = new URLSearchParams(window.location.search);
-        const destination = urlParams.get('destination');
-        console.log('🔍 Checking URL params for destination:', destination);
-        
-        if (destination) {
-            const destinationInput = document.getElementById('destination');
-            const decodedDestination = decodeURIComponent(destination);
-            
-            if (destinationInput) {
-                destinationInput.value = decodedDestination;
-                destinationInput.focus();
-                
-                // Load location info for the pre-filled destination
-                loadLocationInfo(decodedDestination);
-                
-                // Show a notification that destination was pre-filled
-                showMessage(`✈️ Destination pre-filled: ${decodedDestination}`, 'success');
-                console.log('✅ Destination pre-filled from URL:', decodedDestination);
-            } else {
-                console.error('❌ Destination input not found');
-            }
-        } else {
-            console.log('ℹ️ No destination parameter in URL');
-        }
-        
-        // Check for shared itinerary data
-        checkForSharedItinerary();
-    }, 100);
-    
-    console.log('✅ Planner page initialization completed');
+    const urlParams = new URLSearchParams(window.location.search);
+    const destination = urlParams.get('destination');
+    if (destination) {
+        document.getElementById('destination').value = destination;
+        loadLocationInfo(destination);
+    }
 }
 
 // Setup date validation
@@ -599,82 +463,19 @@ function setupDateCalculation() {
 // Initialize autocomplete
 function initializeAutocomplete() {
     const input = document.getElementById('destination');
-    if (!input) {
-        console.warn('❌ Destination input not found');
-        return;
-    }
-    
-    console.log('🔍 Checking Google Maps API availability...');
-    console.log('Google object:', typeof google);
-    console.log('Google.maps:', typeof google?.maps);
-    console.log('Google.maps.places:', typeof google?.maps?.places);
-    
-    if (typeof google !== 'undefined' && google.maps && google.maps.places && google.maps.places.Autocomplete) {
-        try {
-            autocomplete = new google.maps.places.Autocomplete(input, {
-                types: ['(cities)'],
-                fields: ['place_id', 'geometry', 'name', 'formatted_address'],
-                componentRestrictions: {} // Allow all countries
-            });
-
-            autocomplete.addListener('place_changed', function() {
-                const place = autocomplete.getPlace();
-                console.log('📍 Place selected from autocomplete:', place);
-                
-                if (place.geometry) {
-                    const placeName = place.formatted_address || place.name;
-                    loadLocationInfo(placeName);
-                    showMessage('✅ Location selected from suggestions', 'success');
-                } else {
-                    console.warn('⚠️ Place selected but no geometry available');
-                }
-            });
-            
-            // Add additional event listeners for better UX
-            input.addEventListener('focus', function() {
-                if (autocomplete) {
-                    // Clear any previous value to show fresh suggestions
-                    google.maps.event.trigger(autocomplete, 'focus');
-                }
-            });
-            
-            console.log('✅ Google Places Autocomplete initialized successfully');
-        } catch (error) {
-            console.error('❌ Error initializing Google Places Autocomplete:', error);
-            setupFallbackAutocomplete(input);
-        }
-    } else {
-        console.warn('❌ Google Maps Places API not available - setting up fallback');
-        console.log('Available Google API:', {
-            google: typeof google,
-            maps: typeof google?.maps,
-            places: typeof google?.maps?.places,
-            Autocomplete: typeof google?.maps?.places?.Autocomplete
+    if (input && google && google.maps) {
+        autocomplete = new google.maps.places.Autocomplete(input, {
+            types: ['(cities)'],
+            fields: ['place_id', 'geometry', 'name', 'formatted_address']
         });
-        setupFallbackAutocomplete(input);
-    }
-}
 
-// Fallback autocomplete functionality
-function setupFallbackAutocomplete(input) {
-    if (!input) return;
-    
-    input.addEventListener('blur', function() {
-        if (this.value.trim()) {
-            loadLocationInfo(this.value.trim());
-        }
-    });
-    
-    input.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            if (this.value.trim()) {
-                loadLocationInfo(this.value.trim());
+        autocomplete.addListener('place_changed', function() {
+            const place = autocomplete.getPlace();
+            if (place.geometry) {
+                loadLocationInfo(place.formatted_address || place.name);
             }
-        }
-    });
-    
-    console.log('✅ Fallback autocomplete setup completed');
+        });
+    }
 }
 
 // Load location information
@@ -780,9 +581,6 @@ document.getElementById('tripForm').addEventListener('submit', async function(e)
     
     // Show loading
     const generateBtn = document.getElementById('generateBtn');
-    const originalText = generateBtn.textContent;
-    generateBtn.disabled = true;
-    generateBtn.textContent = '⏳ Generating...';
     
     const resultsSection = document.getElementById('results');
     const itineraryContent = document.getElementById('itineraryContent');
@@ -850,9 +648,6 @@ document.getElementById('tripForm').addEventListener('submit', async function(e)
         console.error('Error:', error);
         itineraryContent.innerHTML = '';
         showMessage('Error generating itinerary. Please try again.', 'error');
-    } finally {
-        generateBtn.disabled = false;
-        generateBtn.textContent = originalText;
     }
 });
 
@@ -905,88 +700,16 @@ function addLocationInfoToItinerary(data) {
 function formatItinerary(itinerary) {
     currentItinerary = itinerary;
     
-    // Extract safety information
-    const safetyInfo = extractSafetyInfo(itinerary);
-    if (safetyInfo) {
-        displaySafetyPanel(safetyInfo);
-    }
-    
-    // Remove safety section from main itinerary display
-    let itineraryWithoutSafety = itinerary.replace(/SAFETY\s*(&\s*SECURITY)?\s*SECTION?:?[\s\S]*$/i, '');
-    
     // Remove unwanted characters and format
-    let formatted = itineraryWithoutSafety
+    let formatted = itinerary
         .replace(/#{1,6}\s*/g, '') // Remove # characters
         .replace(/\*\*/g, '') // Remove ** characters
         .replace(/\*/g, '') // Remove * characters
         .replace(/Day (\d+):/g, '<h3>📅 Day $1</h3>')
-        // Highlight hidden gems
-        .replace(/(hidden gem|secret|local favorite|off.the.beaten.path|lesser.known)/gi, '<span class="highlight-gem">💎 $1</span>')
-        // Highlight travel times
-        .replace(/(\d+)\s*(minutes?|mins?|hours?|hrs?)\s*(walk|drive|by\s*\w+)/gi, '<span class="travel-time">🚶 $1 $2 $3</span>')
-        .replace(/(travel\s*time|journey|commute):\s*(\d+\s*\w+)/gi, '<span class="travel-time">🚗 $1: $2</span>')
         .replace(/\n\n/g, '</p><p>')
         .replace(/\n/g, '<br>');
     
     return `<div>${formatted}</div>`;
-}
-
-function extractSafetyInfo(itinerary) {
-    // Look for safety section in the itinerary
-    const safetyMatch = itinerary.match(/SAFETY\s*(&\s*SECURITY)?\s*SECTION?:?([\s\S]*)$/i);
-    if (safetyMatch) {
-        return safetyMatch[2].trim();
-    }
-    
-    // Alternative patterns
-    const altPatterns = [
-        /SAFETY\s*INFORMATION:?([\s\S]*)$/i,
-        /SAFETY\s*TIPS:?([\s\S]*)$/i,
-        /EMERGENCY\s*INFORMATION:?([\s\S]*)$/i
-    ];
-    
-    for (const pattern of altPatterns) {
-        const match = itinerary.match(pattern);
-        if (match) {
-            return match[1].trim();
-        }
-    }
-    
-    return null;
-}
-
-function displaySafetyPanel(safetyInfo) {
-    const safetyPanel = document.getElementById('safetyPanel');
-    const safetyContent = document.getElementById('safetyContent');
-    
-    if (!safetyInfo) {
-        safetyPanel.style.display = 'none';
-        return;
-    }
-    
-    // Format safety information
-    let formattedSafety = safetyInfo
-        .replace(/#{1,6}\s*/g, '') // Remove # characters
-        .replace(/\*\*/g, '') // Remove ** characters
-        .replace(/\*/g, '') // Remove * characters
-        .replace(/Emergency\s*Contact\s*Numbers?:?/gi, '<div class="safety-emergency"><h5>🚨 Emergency Contacts</h5>')
-        .replace(/Common\s*Safety\s*Concerns?:?/gi, '</div><h4>⚠️ Safety Concerns</h4>')
-        .replace(/Safe\s*Areas?\s*vs\s*Areas?\s*to\s*Avoid:?/gi, '<h4>📍 Areas Guide</h4>')
-        .replace(/Local\s*Scams?:?/gi, '<h4>🎭 Scam Awareness</h4>')
-        .replace(/Safety\s*Apps?\s*or\s*Resources?:?/gi, '<h4>📱 Safety Resources</h4>')
-        .replace(/Cultural\s*Customs?\s*and\s*Etiquette:?/gi, '<h4>🤝 Cultural Guidelines</h4>')
-        .replace(/Health\s*and\s*Medical:?/gi, '<h4>🏥 Health & Medical</h4>')
-        .replace(/Travel\s*Insurance:?/gi, '<h4>🛡️ Insurance</h4>')
-        .replace(/\n\n/g, '</p><p>')
-        .replace(/\n/g, '<br>');
-    
-    safetyContent.innerHTML = `<div>${formattedSafety}</div>`;
-    safetyPanel.style.display = 'block';
-    
-    // Scroll to safety panel
-    setTimeout(() => {
-        safetyPanel.scrollIntoView({ behavior: 'auto', block: 'nearest' });
-    }, 500);
 }
 
 // Itinerary management functions
@@ -999,9 +722,6 @@ async function refineItinerary() {
 
     // Show loading state
     const updateBtn = document.querySelector('button[onclick="refineItinerary()"]');
-    const originalText = updateBtn.textContent;
-    updateBtn.disabled = true;
-    updateBtn.textContent = '🔄 Updating...';
     
     // Show updating message
     showMessage('Updating your itinerary...', 'info');
@@ -1048,10 +768,6 @@ async function refineItinerary() {
     } catch (error) {
         console.error('Error refining itinerary:', error);
         showMessage('Error updating itinerary. Please try again.', 'error');
-    } finally {
-        // Reset button state
-        updateBtn.disabled = false;
-        updateBtn.textContent = originalText;
     }
 }
 
@@ -1069,81 +785,27 @@ function getPlainTextItinerary() {
     // Convert HTML to clean plain text
     let plainText = tempDiv.textContent || tempDiv.innerText || '';
     
-    // Enhanced cleaning for better readability
+    // Additional formatting for better readability
     plainText = plainText
-        // Remove markdown-style characters
-        .replace(/[*#_~`]+/g, '')
-        // Remove excessive dashes and special characters
-        .replace(/[-—–]+/g, '-')
-        .replace(/[•·]/g, '•')
         // Clean up excessive whitespace
         .replace(/\s+/g, ' ')
         .replace(/\n\s+/g, '\n')
         // Add proper spacing around day headers
         .replace(/(Day\s+\d+[:\s]*[^\n]*)/gi, '\n\n📅 $1\n')
         // Add spacing around time periods
-        .replace(/(Morning|Afternoon|Evening|Night)[:\s]*([^\n]*)/gi, '\n🕐 $1: $2\n')
-        // Format bullet points consistently
-        .replace(/[-—–]\s*/g, '\n• ')
-        .replace(/^\s*[•·]\s*/gm, '• ')
+        .replace(/(Morning|Afternoon|Evening|Night)[:\s]*([^\n]*)/gi, '\n� $1: $2\n')
+        // Format bullet points
+        .replace(/—\s*/g, '\n• ')
         // Clean up multiple newlines
         .replace(/\n{3,}/g, '\n\n')
-        // Remove any remaining weird characters except common punctuation
-        .replace(/[^\w\s\n•📅🕐🌍📍✨🌐.,!?():/-]/g, '')
         .trim();
     
     // Add header info if available
-    const headerInfo = `🌍 TRAVEL ITINERARY\n${currentDestination ? `📍 Destination: ${currentDestination}` : ''}\n${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}\n${'='.repeat(50)}\n\n`;
+    const headerInfo = `🌍 TRAVEL ITINERARY\n${currentDestination ? `📍 Destination: ${currentDestination}` : ''}\n${currentItinerary.includes('duration') ? '' : ''}\n${'='.repeat(50)}\n\n`;
     
-    const finalText = headerInfo + plainText + '\n\n' + '='.repeat(50) + `\n✨ Generated by ${CONFIG.APP_NAME} - ${CONFIG.APP_DESCRIPTION}\n🌐 Create your own at ${CONFIG.APP_URL}`;
+    const finalText = headerInfo + plainText + '\n\n' + '='.repeat(50) + '\n✨ Generated by go.travel - AI Travel Planner\n🌐 https://gotravel-ai-407949658262.us-central1.run.app';
     
     console.log('Converted itinerary preview:', finalText.substring(0, 300) + '...');
-    return finalText;
-}
-
-// Helper function to get extra clean text for PDF (removes markdown chars)
-function getCleanPlainTextItinerary() {
-    if (!currentItinerary) {
-        console.log('No currentItinerary available');
-        return '';
-    }
-    
-    // Create a temporary div to convert HTML to plain text
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = currentItinerary;
-    
-    // Convert HTML to clean plain text
-    let plainText = tempDiv.textContent || tempDiv.innerText || '';
-    
-    // Extra aggressive cleaning for PDFs and exports
-    plainText = plainText
-        // Remove ALL markdown-style characters aggressively
-        .replace(/[*#_~`\[\]]+/g, '')
-        // Remove special characters that cause formatting issues
-        .replace(/[""'']/g, '"')
-        .replace(/[–—]/g, '-')
-        .replace(/[•·◦▪▫]/g, '• ')
-        // Clean up excessive whitespace
-        .replace(/\s+/g, ' ')
-        .replace(/\n\s+/g, '\n')
-        // Format day headers cleanly
-        .replace(/(Day\s+\d+[:\s]*[^\n]*)/gi, '\n\nDay $1\n')
-        // Format time periods cleanly
-        .replace(/(Morning|Afternoon|Evening|Night)[:\s]*([^\n]*)/gi, '\n$1: $2\n')
-        // Format bullet points consistently
-        .replace(/[-—–]\s*/g, '\n• ')
-        .replace(/^\s*[•·◦▪▫]\s*/gm, '• ')
-        // Clean up multiple newlines
-        .replace(/\n{3,}/g, '\n\n')
-        // Remove any remaining special characters except basic punctuation
-        .replace(/[^\w\s\n.,!?():/-]/g, '')
-        .trim();
-    
-    // Add clean header info
-    const headerInfo = `TRAVEL ITINERARY\n${currentDestination ? `Destination: ${currentDestination}` : ''}\n${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}\n${'='.repeat(50)}\n\n`;
-    
-    const finalText = headerInfo + plainText + '\n\n' + '='.repeat(50) + `\nGenerated by ${CONFIG.APP_NAME} - ${CONFIG.APP_DESCRIPTION}\nCreate your own at ${CONFIG.APP_URL}`;
-    
     return finalText;
 }
 
@@ -1162,65 +824,22 @@ function shareItinerary() {
     
     const safeDestination = currentDestination || 'Travel Destination';
     
-    // Create a shareable URL with the itinerary data (for backup)
-    const shareableUrl = generateShareableUrl();
-    
     if (navigator.share) {
-        // Use native sharing with full itinerary text
         navigator.share({
             title: `My ${safeDestination} Travel Itinerary`,
-            text: `Check out my AI-generated travel itinerary for ${safeDestination}!\n\n${plainText}\n\nCreate your own at: ${shareableUrl}`,
+            text: plainText,
+            url: window.location.href
         }).then(() => {
             showMessage('Itinerary shared successfully!', 'success');
         }).catch((error) => {
             console.log('Share failed, falling back to clipboard:', error);
-            // Fallback to clipboard with full text
-            const shareText = `Check out my AI-generated travel itinerary for ${safeDestination}!\n\n${plainText}\n\nCreate your own at: ${shareableUrl}`;
-            navigator.clipboard.writeText(shareText).then(() => {
-                showMessage('Full itinerary copied to clipboard!', 'success');
+            // Fallback to clipboard
+            navigator.clipboard.writeText(plainText).then(() => {
+                showMessage('Itinerary copied to clipboard!', 'success');
             }).catch(() => {
                 showMessage('Unable to share or copy. Please copy manually.', 'error');
             });
         });
-    } else {
-        // Fallback: copy to clipboard with full text
-        const shareText = `Check out my AI-generated travel itinerary for ${safeDestination}!\n\n${plainText}\n\nCreate your own at: ${shareableUrl}`;
-        navigator.clipboard.writeText(shareText).then(() => {
-            showMessage('Full itinerary copied to clipboard!', 'success');
-        }).catch(() => {
-            showMessage('Unable to copy to clipboard. Please copy manually.', 'error');
-        });
-    }
-}
-
-function generateShareableUrl() {
-    if (!currentItinerary || !currentDestination) {
-        return window.location.href;
-    }
-    
-    try {
-        // Create a compressed version of the itinerary data
-        const itineraryData = {
-            destination: currentDestination,
-            duration: currentDuration || '3 days',
-            interests: Array.from(document.querySelectorAll('input[name="interests"]:checked')).map(cb => cb.value),
-            budget: document.getElementById('budget')?.value || 'moderate',
-            timestamp: Date.now()
-        };
-        
-        // Encode the data as base64 for URL sharing
-        const encodedData = btoa(JSON.stringify(itineraryData));
-        
-        // Create the shareable URL
-        const baseUrl = window.location.origin + window.location.pathname;
-        const shareableUrl = `${baseUrl}?shared=${encodedData}`;
-        
-        return shareableUrl;
-    } catch (error) {
-        console.error('Error generating shareable URL:', error);
-        return window.location.href;
-    }
-}
     } else {
         // Fallback: copy to clipboard
         navigator.clipboard.writeText(plainText).then(() => {
@@ -1276,136 +895,32 @@ function downloadPDF() {
         showMessage('No itinerary to export. Please generate one first.', 'error');
         return;
     }
-    
-    try {
-        // Check if jsPDF is available - try multiple ways to access it
-        let jsPDF;
-        if (typeof window.jsPDF !== 'undefined') {
-            jsPDF = window.jsPDF.jsPDF || window.jsPDF;
-        } else if (typeof jsPDF !== 'undefined') {
-            // Global jsPDF variable
-        } else {
-            console.log('jsPDF not available, falling back to text download');
-            downloadText();
-            return;
-        }
-        
-        const doc = new jsPDF();
-        
-        // Get clean text content without markdown characters
-        const plainText = getCleanPlainTextItinerary();
-        
-        // Set up PDF styling
-        doc.setFont('helvetica');
-        doc.setFontSize(16);
-        
-        // Add title
-        const safeDestination = currentDestination || 'Travel Destination';
-        doc.text(`${safeDestination} - Travel Itinerary`, 20, 20);
-        
-        // Add generated date
-        doc.setFontSize(10);
-        doc.text(`Generated: ${new Date().toLocaleDateString()}`, 20, 30);
-        
-        // Add content
-        doc.setFontSize(12);
-        
-        // Split text into lines that fit the page width
-        const pageWidth = doc.internal.pageSize.getWidth();
-        const margins = 20;
-        const maxLineWidth = pageWidth - (margins * 2);
-        
-        // Clean the text and split into lines
-        const cleanText = plainText
-            .replace(/[📅🕐🌍📍✨🌐]/g, '') // Remove emojis for PDF
-            .replace(/={50}/g, '--------------------') // Replace long equals with dashes
-            .split('\n');
-        
-        let yPosition = 45;
-        const lineHeight = 7;
-        const pageHeight = doc.internal.pageSize.getHeight();
-        
-        cleanText.forEach(line => {
-            if (line.trim() === '') {
-                yPosition += lineHeight / 2;
-                return;
-            }
-            
-            // Check if we need a new page
-            if (yPosition > pageHeight - 30) {
-                doc.addPage();
-                yPosition = 20;
-            }
-            
-            // Split long lines
-            const wrappedLines = doc.splitTextToSize(line, maxLineWidth);
-            
-            wrappedLines.forEach(wrappedLine => {
-                if (yPosition > pageHeight - 30) {
-                    doc.addPage();
-                    yPosition = 20;
-                }
-                
-                // Make headers bold
-                if (wrappedLine.includes('Day ') || wrappedLine.includes('TRAVEL ITINERARY')) {
-                    doc.setFont('helvetica', 'bold');
-                } else {
-                    doc.setFont('helvetica', 'normal');
-                }
-                
-                doc.text(wrappedLine, margins, yPosition);
-                yPosition += lineHeight;
-            });
-        });
-        
-        // Save the PDF
-        const safeFileName = safeDestination.replace(/[^a-z0-9\s]/gi, '').replace(/\s+/g, '_');
-        doc.save(`${safeFileName}_itinerary.pdf`);
-        
-        showMessage('PDF itinerary downloaded successfully!', 'success');
-    } catch (error) {
-        console.error('PDF generation error:', error);
-        showMessage('Error generating PDF. Downloading as text instead.', 'warning');
-        downloadText();
-    }
+    // For now, download as text. Can be enhanced with PDF library later
+    downloadText();
 }
 
-function emailItinerary() {
+function copyItinerary() {
     if (!currentItinerary) {
-        showMessage('No itinerary to export. Please generate one first.', 'error');
+        showMessage('No itinerary to copy. Please generate one first.', 'error');
         return;
     }
     
     const plainText = getPlainTextItinerary();
     
     if (!plainText || plainText.trim() === '') {
-        showMessage('Unable to export itinerary. Please try generating a new one.', 'error');
+        showMessage('Unable to copy itinerary. Please try generating a new one.', 'error');
         return;
     }
     
     try {
-        const safeDestination = currentDestination || 'Travel Destination';
-        const subject = encodeURIComponent(`My ${safeDestination} Travel Itinerary`);
-        const body = encodeURIComponent(`Here's my AI-generated travel itinerary for ${safeDestination}:\n\n${plainText}\n\nGenerated by ${CONFIG.APP_NAME} - ${CONFIG.APP_DESCRIPTION}`);
-        
-        // Create mailto link with size limit check
-        const mailtoLink = `mailto:?subject=${subject}&body=${body}`;
-        
-        // Check if mailto URL is too long (some email clients have limits)
-        if (mailtoLink.length > 2000) {
-            // Fallback: copy to clipboard instead
-            navigator.clipboard.writeText(plainText).then(() => {
-                showMessage('Itinerary copied to clipboard! The email content was too long for direct email.', 'success');
-            }).catch(() => {
-                showMessage('Please copy the itinerary manually. Email content too long.', 'error');
-            });
-        } else {
-            window.open(mailtoLink);
-            showMessage('Email client opened with your itinerary!', 'success');
-        }
+        navigator.clipboard.writeText(plainText).then(() => {
+            showMessage('Itinerary copied to clipboard!', 'success');
+        }).catch(() => {
+            showMessage('Unable to copy to clipboard. Please copy manually.', 'error');
+        });
     } catch (error) {
-        console.error('Email error:', error);
-        showMessage('Error preparing email. Please try copying to clipboard instead.', 'error');
+        console.error('Copy error:', error);
+        showMessage('Error copying itinerary. Please try again.', 'error');
     }
 }
 
@@ -1459,94 +974,15 @@ function showMessage(message, type) {
 // Initialize page when Google Maps API is loaded
 window.initializePage = initializePage;
 
-// Also initialize on DOMContentLoaded as fallback
+// Fallback initialization for duration calculation if Google Maps fails
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('📄 DOM Content Loaded - checking initialization...');
-    
-    // Check URL parameters immediately
-    const urlParams = new URLSearchParams(window.location.search);
-    const destination = urlParams.get('destination');
-    console.log('🔍 URL destination parameter:', destination);
-    
-    if (destination) {
-        const decodedDestination = decodeURIComponent(destination);
-        console.log('🎯 Decoded destination:', decodedDestination);
-        
-        // Set destination immediately
-        const destinationInput = document.getElementById('destination');
-        if (destinationInput) {
-            destinationInput.value = decodedDestination;
-            console.log('✅ Destination input set to:', decodedDestination);
-            showMessage(`✈️ Destination pre-filled: ${decodedDestination}`, 'success');
-        }
-    }
-    
-    // Initialize other functionality
-    setupDateCalculation();
-    
-    // Try to initialize the page after a delay if Google Maps hasn't done it
+    // Add a small delay to allow Google Maps to load first
     setTimeout(function() {
-        const destinationInput = document.getElementById('destination');
-        if (destinationInput && destination && !destinationInput.value) {
-            // Google Maps initialization might have failed, set manually
-            destinationInput.value = decodeURIComponent(destination);
-            console.log('🔄 Fallback: Set destination via DOMContentLoaded');
-        }
-        
-        // Try to initialize Google Places if available
-        if (typeof initializeAutocomplete === 'function') {
-            initializeAutocomplete();
+        // If Google Maps hasn't initialized the date calculation, do it manually
+        const durationInput = document.getElementById('duration');
+        if (durationInput && durationInput.value === '0') {
+            setupDateCalculation();
         }
     }, 1000);
 });
-
-function checkForSharedItinerary() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const sharedData = urlParams.get('shared');
-    
-    if (sharedData) {
-        try {
-            const itineraryData = JSON.parse(atob(sharedData));
-            loadSharedItinerary(itineraryData);
-        } catch (error) {
-            console.error('Error loading shared itinerary:', error);
-            showMessage('Invalid shared itinerary link.', 'error');
-        }
-    }
-}
-
-function loadSharedItinerary(data) {
-    if (!data.destination) return;
-    
-    // Fill in the form with shared data
-    document.getElementById('destination').value = data.destination;
-    
-    if (data.duration) {
-        document.getElementById('duration').value = data.duration;
-    }
-    
-    if (data.budget) {
-        const budgetSelect = document.getElementById('budget');
-        if (budgetSelect) {
-            budgetSelect.value = data.budget;
-        }
-    }
-    
-    if (data.interests && Array.isArray(data.interests)) {
-        data.interests.forEach(interest => {
-            const checkbox = document.querySelector(`input[name="interests"][value="${interest}"]`);
-            if (checkbox) {
-                checkbox.checked = true;
-            }
-        });
-    }
-    
-    // Show a message that this is a shared itinerary
-    showMessage(`Loading shared itinerary for ${data.destination}...`, 'info');
-    
-    // Auto-generate the itinerary
-    setTimeout(() => {
-        generateItinerary();
-    }, 1000);
-}
 {% endblock %}

@@ -13,7 +13,13 @@
 }
 
 .explore-header h1 {
-    font-family: var(--font-heading);
+                   <div class="info-item">
+                    <span class="info-icon">🛡️</span>
+                    <div class="info-text">
+                        <div class="info-label">Safety Rating</div>
+                        <div class="info-value" title="${dest.safety_tips}">${getSafetyRating(dest.safety_rating)} (${dest.safety_rating}/5.0)</div>
+                    </div>
+                </div>amily: var(--font-heading);
     font-size: 3rem;
     margin-bottom: 1rem;
 }
@@ -28,17 +34,14 @@
     max-width: 600px;
     margin: 0 auto;
     position: relative;
-    display: flex;
-    align-items: center;
 }
 
 .search-input {
     width: 100%;
-    padding: 1rem 4rem 1rem 1.5rem; /* Add right padding for button */
+    padding: 1rem 1.5rem;
     border: 2px solid #e5e7eb;
     border-radius: 50px;
     font-size: 1.1rem;
-    transition: border-color 0.3s ease;
 }
 
 .search-input:focus {
@@ -50,23 +53,28 @@
 .search-btn {
     position: absolute;
     right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
     background: var(--primary-color);
     color: var(--white);
     border: none;
     padding: 0.75rem 1.5rem;
     border-radius: 50px;
     cursor: pointer;
-    transition: all 0.3s ease;
     height: 48px;
     display: flex;
     align-items: center;
     justify-content: center;
-    min-width: 48px;
+    transition: none;
 }
 
-.search-btn:hover {
-    background: var(--primary-dark);
-    transform: scale(1.05);
+.search-btn:hover,
+.search-btn:focus,
+.search-btn:active {
+    background: var(--primary-color);
+    transform: translateY(-50%);
+    box-shadow: none;
+    outline: none;
 }
 
 .filters {
@@ -83,10 +91,8 @@
     background: var(--white);
     border-radius: 25px;
     cursor: pointer;
-    transition: all 0.3s ease;
 }
 
-.filter-btn:hover,
 .filter-btn.active {
     background: var(--primary-color);
     color: var(--white);
@@ -95,60 +101,68 @@
 
 .temp-toggle {
     margin-left: auto;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
 }
 
 .temp-switch {
     position: relative;
-    width: 60px;
-    height: 30px;
-    background: var(--accent-color); /* Changed: Start with accent color for Fahrenheit */
-    border-radius: 30px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    border: none;
-    outline: none;
+    display: inline-block;
+    width: 80px;
+    height: 34px;
 }
 
-.temp-switch.active {
-    background: #ccc; /* Changed: Gray when Celsius is active */
+.temp-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
 }
 
-.temp-switch::before {
-    content: '';
+.temp-slider {
     position: absolute;
-    top: 3px;
-    right: 3px; /* Changed: Start on the right for Fahrenheit */
-    width: 24px;
-    height: 24px;
-    background: white;
-    border-radius: 50%;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-.temp-switch.active::before {
-    transform: translateX(-30px); /* Changed: Move left when Celsius active */
-}
-
-.temp-labels {
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--accent-color);
+    border-radius: 34px;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    font-size: 0.9rem;
+    justify-content: space-between;
+    padding: 0 8px;
+    font-size: 12px;
+    color: var(--white);
     font-weight: 600;
-    color: var(--text-color);
 }
 
-.temp-label {
-    min-width: 20px;
-    text-align: center;
+.temp-slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    border-radius: 50%;
 }
 
-.temp-label.active {
-    color: var(--accent-color);
+input:checked + .temp-slider:before {
+    transform: translateX(46px);
+}
+
+.temp-slider .temp-unit-left {
+    opacity: 1;
+}
+
+.temp-slider .temp-unit-right {
+    opacity: 0.5;
+}
+
+input:checked + .temp-slider .temp-unit-left {
+    opacity: 0.5;
+}
+
+input:checked + .temp-slider .temp-unit-right {
+    opacity: 1;
 }
 
 .destinations-grid {
@@ -163,13 +177,7 @@
     border-radius: var(--border-radius);
     overflow: hidden;
     box-shadow: var(--shadow-md);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
     cursor: pointer;
-}
-
-.destination-card:hover {
-    transform: translateY(-5px);
-    box-shadow: var(--shadow-lg);
 }
 
 .destination-header {
@@ -249,7 +257,6 @@
     border-radius: 8px;
     cursor: pointer;
     font-weight: 600;
-    transition: all 0.3s ease;
 }
 
 .btn-primary {
@@ -263,212 +270,9 @@
     border: 1px solid #e5e7eb;
 }
 
-.action-btn:hover {
-    transform: translateY(-1px);
-}
 
-.loading-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-    gap: 2rem;
-    padding: 3rem 0;
-}
 
-.loading-card {
-    background: var(--white);
-    border-radius: var(--border-radius);
-    padding: 2rem;
-    text-align: center;
-    box-shadow: var(--shadow-md);
-}
 
-.spinner {
-    width: 32px;
-    height: 32px;
-    border: 3px solid #e5e7eb;
-    border-top: 3px solid var(--primary-color);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin: 0 auto 1rem;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-/* Modal Styles */
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.7);
-    z-index: 1000;
-    display: none;
-    justify-content: center;
-    align-items: center;
-    backdrop-filter: blur(4px);
-}
-
-.modal-overlay.active {
-    display: flex;
-}
-
-.destination-modal {
-    background: var(--white);
-    border-radius: var(--border-radius);
-    max-width: 900px;
-    width: 90%;
-    max-height: 90vh;
-    overflow-y: auto;
-    position: relative;
-    box-shadow: var(--shadow-lg);
-}
-
-.modal-header {
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-    color: var(--white);
-    padding: 2rem;
-    text-align: center;
-    position: relative;
-}
-
-.modal-close {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    background: rgba(255, 255, 255, 0.2);
-    border: none;
-    color: var(--white);
-    font-size: 1.5rem;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.3s ease;
-}
-
-.modal-close:hover {
-    background: rgba(255, 255, 255, 0.3);
-}
-
-.modal-emoji {
-    font-size: 4rem;
-    margin-bottom: 1rem;
-}
-
-.modal-title {
-    font-size: 2.5rem;
-    font-weight: 700;
-    margin-bottom: 0.5rem;
-}
-
-.modal-subtitle {
-    font-size: 1.2rem;
-    opacity: 0.9;
-}
-
-.modal-body {
-    padding: 2rem;
-}
-
-.modal-content-grid {
-    display: grid;
-    grid-template-columns: 1fr 400px;
-    gap: 2rem;
-    margin-bottom: 2rem;
-}
-
-.modal-info {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.modal-info-item {
-    display: flex;
-    align-items: center;
-    padding: 1rem;
-    background: var(--background-color);
-    border-radius: 8px;
-    border-left: 4px solid var(--primary-color);
-}
-
-.modal-info-icon {
-    font-size: 1.5rem;
-    margin-right: 1rem;
-    width: 35px;
-}
-
-.modal-info-content h4 {
-    margin: 0 0 0.25rem 0;
-    font-weight: 600;
-    color: var(--text-color);
-}
-
-.modal-info-content p {
-    margin: 0;
-    color: var(--text-light);
-}
-
-.modal-map {
-    background: #f8f9fa;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    height: 300px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--text-light);
-}
-
-.modal-description {
-    background: var(--background-color);
-    padding: 1.5rem;
-    border-radius: 8px;
-    line-height: 1.6;
-    color: var(--text-color);
-    margin-bottom: 2rem;
-}
-
-.modal-actions {
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-}
-
-.modal-action-btn {
-    padding: 1rem 2rem;
-    border: none;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.modal-btn-primary {
-    background: var(--primary-color);
-    color: var(--white);
-}
-
-.modal-btn-secondary {
-    background: var(--white);
-    color: var(--primary-color);
-    border: 2px solid var(--primary-color);
-}
-
-.modal-action-btn:hover {
-    transform: translateY(-2px);
-}
 
 /* Responsive */
 @media (max-width: 768px) {
@@ -489,23 +293,48 @@
     .destination-actions {
         flex-direction: column;
     }
+}
 
-    .destination-modal {
-        width: 95%;
-        max-height: 95vh;
-    }
+/* Safety-related styles */
+.safety-alert {
+    background: #fff3cd;
+    border: 1px solid #ffeaa7;
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 1rem 0;
+    color: #856404;
+}
 
-    .modal-content-grid {
-        grid-template-columns: 1fr;
-    }
+.safety-tip {
+    background: #d1ecf1;
+    border: 1px solid #bee5eb;
+    border-radius: 8px;
+    padding: 0.75rem;
+    margin: 0.5rem 0;
+    color: #0c5460;
+    font-size: 0.9rem;
+}
 
-    .modal-map {
-        height: 250px;
-    }
+.safety-rating-high {
+    color: #2ed573;
+}
 
-    .modal-actions {
-        flex-direction: column;
-    }
+.safety-rating-medium {
+    color: #ffa502;
+}
+
+.safety-rating-low {
+    color: #ff4757;
+}
+
+.copy-button {
+    background: var(--secondary-color);
+    color: var(--white);
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
 }
 {% endblock %}
 
@@ -534,12 +363,40 @@
             <button class="filter-btn" data-filter="city">City</button>
             <button class="filter-btn" data-filter="nature">Nature</button>
             <div class="temp-toggle">
-                <div class="temp-labels">
-                    <span class="temp-label" id="celsiusLabel">°C</span>
-                    <button class="temp-switch" id="tempSwitch" onclick="toggleTemperatureUnit()"></button>
-                    <span class="temp-label active" id="fahrenheitLabel">°F</span>
+                <label class="temp-switch">
+                    <input type="checkbox" id="tempToggle" onchange="toggleTemperatureUnit()">
+                    <span class="temp-slider">
+                        <span class="temp-unit-left">°C</span>
+                        <span class="temp-unit-right">°F</span>
+                    </span>
+                </label>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Safety Tips Section -->
+<section class="safety-section" style="background: #f8f9fa; padding: 2rem 0; border-bottom: 1px solid #e5e7eb;">
+    <div class="container">
+        <div class="safety-alert">
+            <h3 style="margin: 0 0 1rem 0; color: #856404;">🛡️ Travel Safety Reminders</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+                <div class="safety-tip">
+                    📱 <strong>Emergency Contacts:</strong> Save local emergency numbers and embassy contacts
+                </div>
+                <div class="safety-tip">
+                    🏥 <strong>Travel Insurance:</strong> Ensure you have comprehensive travel insurance coverage
+                </div>
+                <div class="safety-tip">
+                    💊 <strong>Health Precautions:</strong> Check vaccination requirements and bring necessary medications
+                </div>
+                <div class="safety-tip">
+                    💳 <strong>Financial Security:</strong> Use multiple payment methods and inform your bank of travel plans
                 </div>
             </div>
+            <button class="copy-button" onclick="copySafetyTips()" style="margin-top: 1rem;">
+                📋 Copy Safety Checklist
+            </button>
         </div>
     </div>
 </section>
@@ -548,100 +405,10 @@
 <section class="destinations-section">
     <div class="container">
         <div id="destinationsGrid" class="destinations-grid">
-            <!-- Loading cards will be shown initially -->
-            <div class="loading-card">
-                <div class="spinner"></div>
-                <p>Loading amazing destinations...</p>
-            </div>
-            <div class="loading-card">
-                <div class="spinner"></div>
-                <p>Gathering travel insights...</p>
-            </div>
-            <div class="loading-card">
-                <div class="spinner"></div>
-                <p>Checking weather conditions...</p>
-            </div>
+            <!-- Destinations will be loaded here -->
         </div>
     </div>
 </section>
-
-<!-- Destination Modal -->
-<div id="destinationModal" class="modal-overlay">
-    <div class="destination-modal">
-        <div class="modal-header">
-            <button class="modal-close" onclick="closeDestinationModal()">&times;</button>
-            <div class="modal-emoji" id="modalEmoji">🏙️</div>
-            <h2 class="modal-title" id="modalTitle">Destination Name</h2>
-            <p class="modal-subtitle" id="modalSubtitle">Country</p>
-        </div>
-        
-        <div class="modal-body">
-            <div class="modal-content-grid">
-                <div class="modal-info">
-                    <div class="modal-info-item">
-                        <span class="modal-info-icon">🌤️</span>
-                        <div class="modal-info-content">
-                            <h4>Current Weather</h4>
-                            <p id="modalWeather">Loading...</p>
-                        </div>
-                    </div>
-                    
-                    <div class="modal-info-item">
-                        <span class="modal-info-icon">🕒</span>
-                        <div class="modal-info-content">
-                            <h4>Local Time</h4>
-                            <p id="modalTime">Loading...</p>
-                        </div>
-                    </div>
-                    
-                    <div class="modal-info-item">
-                        <span class="modal-info-icon">🎯</span>
-                        <div class="modal-info-content">
-                            <h4>Attractions</h4>
-                            <p id="modalAttractions">Loading...</p>
-                        </div>
-                    </div>
-                    
-                    <div class="modal-info-item">
-                        <span class="modal-info-icon">�</span>
-                        <div class="modal-info-content">
-                            <h4>Area Size</h4>
-                            <p id="modalArea">Loading...</p>
-                        </div>
-                    </div>
-                    
-                    <div class="modal-info-item">
-                        <span class="modal-info-icon">🛡️</span>
-                        <div class="modal-info-content">
-                            <h4>Safety Rating</h4>
-                            <p id="modalSafety">Loading...</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="modal-map">
-                    <div id="modalMapContainer">
-                        📍 Interactive Map<br>
-                        <small>Click to view on Google Maps</small>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="modal-description">
-                <p id="modalDescription">Loading destination details...</p>
-            </div>
-            
-            <div class="modal-actions">
-                <a href="#" class="modal-action-btn modal-btn-primary" id="modalPlanTrip">
-                    ✈️ Plan Trip
-                </a>
-                <a href="#" class="modal-action-btn modal-btn-secondary" id="modalViewMap">
-                    🗺️ View on Map
-                </a>
-            </div>
-        </div>
-    </div>
-</div>
 {% endblock %}
 
 {% block scripts %}
@@ -712,7 +479,7 @@ function displayDestinations(destinations) {
         }
         
         return `
-        <div class="destination-card" onclick="openDestinationModal('${dest.name}', '${dest.country}')">
+        <div class="destination-card" onclick="viewDestination('${dest.name}', '${dest.country}')">
             <div class="destination-header">
                 <div class="destination-emoji">${dest.emoji}</div>
                 <div class="destination-name">${dest.name}</div>
@@ -734,10 +501,10 @@ function displayDestinations(destinations) {
                     </div>
                 </div>
                 <div class="info-item">
-                    <span class="info-icon">👥</span>
+                    <span class="info-icon">�️</span>
                     <div class="info-text">
-                        <div class="info-label">Attractions</div>
-                        <div class="info-value">${dest.attractions}</div>
+                        <div class="info-label">Safety Rating</div>
+                        <div class="info-value">${getSafetyRating(dest.safety_rating)} (${dest.safety_rating}/5.0)</div>
                     </div>
                 </div>
                 <div class="destination-description">
@@ -748,8 +515,8 @@ function displayDestinations(destinations) {
                 <button class="action-btn btn-primary" onclick="event.stopPropagation(); planTrip('${dest.name}, ${dest.country}')">
                     Plan Trip
                 </button>
-                <button class="action-btn btn-secondary" onclick="event.stopPropagation(); openDestinationModal('${dest.name}', '${dest.country}')">
-                    View Details
+                <button class="action-btn btn-secondary" onclick="event.stopPropagation(); learnMore('${dest.name}', '${dest.country}')">
+                    Learn More
                 </button>
             </div>
         </div>
@@ -823,160 +590,101 @@ function searchDestinations() {
 
 // View destination details (when clicking card)
 function viewDestination(name, country) {
-    openDestinationModal(name, country);
+    // Navigate to trip planner with destination pre-filled
+    window.location.href = `/planner?destination=${encodeURIComponent(name + ', ' + country)}`;
 }
-
-// Open destination modal with details
-async function openDestinationModal(name, country) {
-    const modal = document.getElementById('destinationModal');
-    const destination = allDestinations.find(d => d.name === name && d.country === country);
-    
-    if (!destination) return;
-    
-    // Set basic info immediately
-    document.getElementById('modalEmoji').textContent = destination.emoji;
-    document.getElementById('modalTitle').textContent = name;
-    document.getElementById('modalSubtitle').textContent = country;
-    document.getElementById('modalDescription').textContent = destination.description;
-    
-    // Set weather with temperature conversion
-    let weatherDisplay = destination.weather;
-    const temp = extractTemperature(destination.weather);
-    if (temp !== null) {
-        const convertedTemp = convertTemperature(temp);
-        const description = destination.weather.replace(/\d+°?[CF]?,?\s*/, '');
-        weatherDisplay = `${convertedTemp}, ${description}`;
-    }
-    document.getElementById('modalWeather').textContent = weatherDisplay;
-    
-    document.getElementById('modalTime').textContent = destination.timezone;
-    document.getElementById('modalAttractions').textContent = destination.attractions;
-    document.getElementById('modalArea').textContent = destination.area;
-    document.getElementById('modalSafety').textContent = destination.safety_rating;
-    
-    // Set up action buttons
-    const planTripBtn = document.getElementById('modalPlanTrip');
-    const viewMapBtn = document.getElementById('modalViewMap');
-    
-    planTripBtn.href = `/planner?destination=${encodeURIComponent(name + ', ' + country)}`;
-    viewMapBtn.onclick = () => openGoogleMaps(name, country);
-    
-    // Show modal
-    modal.classList.add('active');
-    document.body.style.overflow = 'hidden';
-    
-    // Initialize map
-    initializeModalMap(name, country);
-    
-    // Try to fetch additional details
-    try {
-        const response = await fetch(`/api/destination-details/${encodeURIComponent(name + ', ' + country)}`);
-        const data = await response.json();
-        
-        if (data.details) {
-            const details = data.details;
-            
-            // Update with more detailed info if available
-            if (details.local_time) {
-                document.getElementById('modalTime').textContent = details.local_time;
-            }
-            // Keep the static data for attractions, area, and safety as they're pre-populated
-            if (details.weather && details.weather !== 'Weather data unavailable') {
-                const temp = extractTemperature(details.weather);
-                if (temp !== null) {
-                    const convertedTemp = convertTemperature(temp);
-                    const description = details.weather.replace(/\d+°?[CF]?,?\s*/, '');
-                    document.getElementById('modalWeather').textContent = `${convertedTemp}, ${description}`;
-                }
-            }
-        }
-    } catch (error) {
-        console.error('Error fetching additional destination details:', error);
-    }
-}
-
-// Close destination modal
-function closeDestinationModal() {
-    const modal = document.getElementById('destinationModal');
-    modal.classList.remove('active');
-    document.body.style.overflow = '';
-}
-
-// Initialize modal map
-function initializeModalMap(name, country) {
-    const mapContainer = document.getElementById('modalMapContainer');
-    const destination = `${name}, ${country}`;
-    
-    // Create interactive Google Maps embed
-    const googleMapsApiKey = window.APP_CONFIG?.google_maps_api_key || null;
-    const encodedDestination = encodeURIComponent(destination);
-    
-    if (!googleMapsApiKey) {
-        mapContainer.innerHTML = '<div style="padding: 2rem; text-align: center; color: #666;">Map unavailable - API key not configured</div>';
-        return;
-    }
-    
-    mapContainer.innerHTML = `
-        <iframe 
-            width="100%" 
-            height="300" 
-            style="border:0; border-radius: 8px;" 
-            loading="lazy" 
-            allowfullscreen 
-            referrerpolicy="no-referrer-when-downgrade" 
-            src="https://www.google.com/maps/embed/v1/place?key=${googleMapsApiKey}&q=${encodedDestination}&zoom=12">
-        </iframe>
-    `;
-}
-
-// Open Google Maps
-function openGoogleMaps(name, country) {
-    const destination = encodeURIComponent(`${name}, ${country}`);
-    const googleMapsUrl = `https://www.google.com/maps/search/${destination}`;
-    window.open(googleMapsUrl, '_blank');
-}
-
-// Close modal when clicking outside
-document.addEventListener('click', function(event) {
-    const modal = document.getElementById('destinationModal');
-    if (event.target === modal) {
-        closeDestinationModal();
-    }
-});
-
-// Close modal with Escape key
-document.addEventListener('keydown', function(event) {
-    if (event.key === 'Escape') {
-        closeDestinationModal();
-    }
-});
 
 // Plan trip for destination
 function planTrip(destination) {
     window.location.href = `/planner?destination=${encodeURIComponent(destination)}`;
 }
 
+// Learn more about destination (improved functionality)
+async function learnMore(name, country) {
+    try {
+        // Fetch detailed destination information
+        const response = await fetch(`/api/destination-details/${encodeURIComponent(name + ', ' + country)}`);
+        const data = await response.json();
+        
+        if (data.details) {
+            // Create a detailed info modal or popup
+            const details = data.details;
+            const attractions = data.attractions || [];
+            
+            let attractionsText = '';
+            if (attractions.length > 0) {
+                attractionsText = '\n\nTop Attractions:\n' + 
+                    attractions.slice(0, 5).map(attraction => `• ${attraction.name}`).join('\n');
+            }
+            
+            const detailInfo = `
+🏙️ ${name}, ${country}
+
+📍 Location: ${details.location?.address || 'Information not available'}
+🌡️ Current Weather: ${(() => {
+                if (!details.weather || details.weather === 'Weather data unavailable') return 'Weather data unavailable';
+                const temp = extractTemperature(details.weather);
+                if (temp !== null) {
+                    const convertedTemp = convertTemperature(temp);
+                    const description = details.weather.replace(/\d+°?[CF]?,?\s*/, '');
+                    return `${convertedTemp}, ${description}`;
+                }
+                return details.weather;
+            })()}
+🕒 Local Time: ${details.local_time || 'Time zone information unavailable'}
+🛡️ Safety Rating: ${details.safety_rating || 'Safety rating unavailable'}
+⚠️ Safety Tips: ${details.safety_tips || 'Follow standard travel safety precautions'}
+
+ℹ️ About:
+${details.description || 'Discover the unique culture, attractions, and experiences this destination has to offer.'}
+${attractionsText}
+
+🎯 Ready to plan your trip? Click "Plan Trip" to get started!
+            `;
+            
+            alert(detailInfo);
+        } else {
+            throw new Error('No destination details available');
+        }
+        
+    } catch (error) {
+        console.error('Error fetching destination details:', error);
+        
+        // Fallback: Show basic info from current data
+        const destination = allDestinations.find(d => d.name === name && d.country === country);
+        if (destination) {
+            const basicInfo = `
+🏙️ ${name}, ${country}
+
+🌡️ Weather: ${(() => {
+                const temp = extractTemperature(destination.weather);
+                if (temp !== null) {
+                    const convertedTemp = convertTemperature(temp);
+                    const description = destination.weather.replace(/\d+°?[CF]?,?\s*/, '');
+                    return `${convertedTemp}, ${description}`;
+                }
+                return destination.weather;
+            })()}
+🕒 Timezone: ${destination.timezone}
+🛡️ Safety Rating: ${destination.safety_rating}/5.0 stars
+⚠️ Safety Tips: ${destination.safety_tips}
+
+ℹ️ ${destination.description}
+
+🎯 Ready to explore? Click "Plan Trip" to create your itinerary!
+            `;
+            alert(basicInfo);
+        }
+    }
+}
+
 // Temperature unit conversion
-let isCelsius = false; // Changed to start with Fahrenheit
+let isCelsius = true;
 let currentDestinations = [];
 
 function toggleTemperatureUnit() {
-    isCelsius = !isCelsius;
-    
-    // Update switch state
-    const tempSwitch = document.getElementById('tempSwitch');
-    const celsiusLabel = document.getElementById('celsiusLabel');
-    const fahrenheitLabel = document.getElementById('fahrenheitLabel');
-    
-    if (isCelsius) {
-        tempSwitch.classList.add('active');
-        celsiusLabel.classList.add('active');
-        fahrenheitLabel.classList.remove('active');
-    } else {
-        tempSwitch.classList.remove('active');
-        celsiusLabel.classList.remove('active');
-        fahrenheitLabel.classList.add('active');
-    }
+    const toggle = document.getElementById('tempToggle');
+    isCelsius = !toggle.checked; // When checked, show Fahrenheit
     
     // Update all displayed temperatures
     updateTemperatureDisplay();
@@ -1007,5 +715,68 @@ function updateTemperatureDisplay() {
 // Store original destinations for temperature conversion
 function storeDestinations(destinations) {
     currentDestinations = destinations;
+}
+
+// Safety rating display function
+function getSafetyRating(rating) {
+    const stars = '★'.repeat(Math.floor(rating)) + '☆'.repeat(5 - Math.floor(rating));
+    let color = '#ff4757'; // Red for low safety
+    if (rating >= 4.5) color = '#2ed573'; // Green for high safety
+    else if (rating >= 3.5) color = '#ffa502'; // Orange for medium safety
+    
+    return `<span style="color: ${color}; font-size: 1.1em;">${stars}</span>`;
+}
+
+// Copy safety tips to clipboard
+function copySafetyTips() {
+    const safetyChecklist = `
+🛡️ TRAVEL SAFETY CHECKLIST
+
+📱 Emergency Contacts:
+• Save local emergency numbers (police, ambulance, fire)
+• Save your country's embassy/consulate contact information
+• Share your itinerary with trusted contacts back home
+
+🏥 Travel Insurance:
+• Purchase comprehensive travel insurance
+• Verify coverage includes medical emergencies and evacuation
+• Keep insurance documents accessible (physical and digital copies)
+
+💊 Health Precautions:
+• Research vaccination requirements for your destination
+• Pack necessary prescription medications with extra supply
+• Bring a basic first aid kit
+• Research common health risks at your destination
+
+💳 Financial Security:
+• Notify your bank and credit card companies of travel plans
+• Use multiple payment methods (cards, cash, mobile payments)
+• Keep backup cards and emergency cash in separate locations
+• Research local currency and exchange rates
+
+🎒 General Safety:
+• Research local laws, customs, and cultural norms
+• Register with your embassy if traveling abroad
+• Keep copies of important documents (passport, ID, insurance)
+• Stay aware of your surroundings and trust your instincts
+• Use reputable transportation and accommodation services
+
+Generated by go.travel - Safe travels! 🌍
+    `;
+    
+    navigator.clipboard.writeText(safetyChecklist).then(() => {
+        const button = event.target;
+        const originalText = button.textContent;
+        button.textContent = '✅ Copied!';
+        button.style.background = '#2ed573';
+        
+        setTimeout(() => {
+            button.textContent = originalText;
+            button.style.background = '';
+        }, 2000);
+    }).catch(err => {
+        console.error('Failed to copy safety tips:', err);
+        alert('Safety checklist copied to clipboard!');
+    });
 }
 {% endblock %}

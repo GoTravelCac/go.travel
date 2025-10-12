@@ -16,12 +16,6 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
-# Application constants
-APP_NAME = "go.travel"
-APP_DESCRIPTION = "AI Travel Itinerary Generator"
-APP_VERSION = "1.0.0"
-APP_URL = "https://gotravel.com"
-
 # Initialize Flask app
 app = Flask(__name__)
 CORS(app)
@@ -29,10 +23,9 @@ CORS(app)
 # Configuration
 class Config:
     def __init__(self):
-        # Try multiple environment variable names for compatibility
-        self.gemini_api_key = os.getenv('GEMINI_API_KEY') or os.getenv('GOOGLE_GEMINI_API_KEY')
-        self.google_api_key = os.getenv('GOOGLE_API_KEY') or os.getenv('GOOGLE_MAPS_API_KEY')
-        self.openweathermap_api_key = os.getenv('OPENWEATHERMAP_API_KEY') or os.getenv('OPENWEATHER_API_KEY')
+        self.gemini_api_key = os.getenv('GEMINI_API_KEY')
+        self.google_api_key = os.getenv('GOOGLE_API_KEY')
+        self.openweathermap_api_key = os.getenv('OPENWEATHERMAP_API_KEY')
         self.gemini_model = None
         self.setup_apis()
     
@@ -42,39 +35,18 @@ class Config:
         self.validate_google_apis()
     
     def setup_gemini(self):
-        """Initialize Gemini AI model with fallback options"""
+        """Initialize Gemini AI model"""
         if not self.gemini_api_key:
             print("❌ GEMINI_API_KEY not found in environment variables")
             return
         
         try:
             genai.configure(api_key=self.gemini_api_key)
-            
-            # Try different models in order of preference
-            models_to_try = [
-                'gemini-1.5-pro',
-                'gemini-1.5-flash', 
-                'gemini-pro'
-            ]
-            
-            for model_name in models_to_try:
-                try:
-                    self.gemini_model = genai.GenerativeModel(model_name)
-                    # Test the model with a simple request
-                    test_response = self.gemini_model.generate_content("Hello")
-                    if test_response:
-                        print(f"✅ Gemini model '{model_name}' initialized successfully")
-                        return
-                except Exception as model_error:
-                    print(f"⚠️ Model '{model_name}' failed: {model_error}")
-                    continue
-            
-            print("❌ No Gemini models available")
-            self.gemini_model = None
-            
+            self.gemini_model = genai.GenerativeModel('gemini-2.0-flash-exp')
+            print("✅ Gemini 2.0 Flash model initialized successfully")
         except Exception as e:
             print(f"❌ Gemini initialization error: {e}")
-            self.gemini_model = None
+            # Fallback to gemini-pro if 2.0 flash is not available
             try:
                 self.gemini_model = genai.GenerativeModel('gemini-pro')
                 print("✅ Gemini Pro model initialized (fallback)")
@@ -350,43 +322,31 @@ except Exception as e:
     google_services = None
     print(f"❌ Failed to initialize Google services: {e}")
 
-@app.route('/api/config')
-def get_config():
-    """Get client-side configuration"""
-    return jsonify({
-        'google_maps_api_key': config.google_api_key,
-        'backend_url': '',  # Use relative URLs
-        'app_name': APP_NAME,
-        'app_description': APP_DESCRIPTION,
-        'app_version': APP_VERSION,
-        'app_url': APP_URL
-    })
-
 @app.route('/')
 def home():
     """Serve the home page"""
-    return render_template('home.html')
+    return render_template('home.html', google_api_key=config.google_api_key)
 
 @app.route('/planner')
 def planner():
     """Serve the trip planner page"""
-    return render_template('planner.html')
+    return render_template('planner.html', google_api_key=config.google_api_key)
 
 @app.route('/explore')
 def explore():
     """Serve the explore destinations page"""
-    return render_template('explore.html')
+    return render_template('explore.html', google_api_key=config.google_api_key)
 
 @app.route('/about')
 def about():
     """Serve the about page"""
-    return render_template('about.html')
+    return render_template('about.html', google_api_key=config.google_api_key)
 
 # Legacy route for backwards compatibility
 @app.route('/index')
 def index():
     """Redirect to planner for backwards compatibility"""
-    return render_template('index.html')
+    return render_template('index.html', google_api_key=config.google_api_key)
 
 # Static file routes
 @app.route('/gotravel.png')
@@ -415,20 +375,20 @@ def api_status():
 def get_destinations():
     """Get popular travel destinations with real-time data"""
     try:
-        # Popular destinations with coordinates and alternative stats
+        # Popular destinations with coordinates and safety ratings
         popular_destinations = [
-            {"name": "Paris", "country": "France", "emoji": "🗼", "lat": 48.8566, "lng": 2.3522, "category": ["city", "popular", "cultural"], "area": "105 km²", "attractions": "130+ museums", "safety_rating": "4.1/5"},
-            {"name": "Tokyo", "country": "Japan", "emoji": "🏯", "lat": 35.6762, "lng": 139.6503, "category": ["city", "popular", "cultural"], "area": "2,194 km²", "attractions": "100+ temples", "safety_rating": "4.8/5"},
-            {"name": "New York", "country": "USA", "emoji": "🗽", "lat": 40.7128, "lng": -74.0060, "category": ["city", "popular"], "area": "1,214 km²", "attractions": "50+ neighborhoods", "safety_rating": "3.8/5"},
-            {"name": "London", "country": "UK", "emoji": "🇬🇧", "lat": 51.5074, "lng": -0.1278, "category": ["city", "popular", "cultural"], "area": "1,572 km²", "attractions": "240+ museums", "safety_rating": "4.2/5"},
-            {"name": "Dubai", "country": "UAE", "emoji": "🏙️", "lat": 25.2048, "lng": 55.2708, "category": ["city", "popular"], "area": "4,114 km²", "attractions": "200+ malls", "safety_rating": "4.6/5"},
-            {"name": "Reykjavik", "country": "Iceland", "emoji": "🌋", "lat": 64.1466, "lng": -21.9426, "category": ["nature", "adventure"], "area": "274 km²", "attractions": "50+ hot springs", "safety_rating": "4.9/5"},
-            {"name": "Cape Town", "country": "South Africa", "emoji": "🦁", "lat": -33.9249, "lng": 18.4241, "category": ["nature", "adventure", "cultural"], "area": "2,461 km²", "attractions": "300+ wine estates", "safety_rating": "3.5/5"},
-            {"name": "Maldives", "country": "Maldives", "emoji": "🏖️", "lat": 3.2028, "lng": 73.2207, "category": ["beach", "popular"], "area": "298 km²", "attractions": "1,200+ islands", "safety_rating": "4.7/5"},
-            {"name": "Bali", "country": "Indonesia", "emoji": "🌺", "lat": -8.3405, "lng": 115.0920, "category": ["beach", "cultural", "nature"], "area": "5,780 km²", "attractions": "2,000+ temples", "safety_rating": "4.3/5"},
-            {"name": "Kyoto", "country": "Japan", "emoji": "🎌", "lat": 35.0116, "lng": 135.7681, "category": ["cultural", "nature"], "area": "827 km²", "attractions": "1,600+ temples", "safety_rating": "4.8/5"},
-            {"name": "Petra", "country": "Jordan", "emoji": "🏜️", "lat": 30.3285, "lng": 35.4444, "category": ["cultural", "adventure"], "area": "264 km²", "attractions": "800+ monuments", "safety_rating": "4.1/5"},
-            {"name": "Barcelona", "country": "Spain", "emoji": "🏖️", "lat": 41.3851, "lng": 2.1734, "category": ["city", "beach", "cultural"], "area": "101 km²", "attractions": "60+ beaches", "safety_rating": "4.0/5"},
+            {"name": "Paris", "country": "France", "emoji": "🗼", "lat": 48.8566, "lng": 2.3522, "category": ["city", "popular", "cultural"], "safety_rating": 4.2, "safety_tips": "Be aware of pickpockets in tourist areas"},
+            {"name": "Tokyo", "country": "Japan", "emoji": "🏯", "lat": 35.6762, "lng": 139.6503, "category": ["city", "popular", "cultural"], "safety_rating": 4.8, "safety_tips": "Very safe city with excellent public safety"},
+            {"name": "New York", "country": "USA", "emoji": "🗽", "lat": 40.7128, "lng": -74.0060, "category": ["city", "popular"], "safety_rating": 4.0, "safety_tips": "Stay alert in busy areas, avoid isolated places at night"},
+            {"name": "London", "country": "UK", "emoji": "🇬🇧", "lat": 51.5074, "lng": -0.1278, "category": ["city", "popular", "cultural"], "safety_rating": 4.3, "safety_tips": "Generally safe, watch for petty theft in crowded areas"},
+            {"name": "Dubai", "country": "UAE", "emoji": "🏙️", "lat": 25.2048, "lng": 55.2708, "category": ["city", "popular"], "safety_rating": 4.6, "safety_tips": "Very safe with strict laws and good security"},
+            {"name": "Reykjavik", "country": "Iceland", "emoji": "🌋", "lat": 64.1466, "lng": -21.9426, "category": ["nature", "adventure"], "safety_rating": 4.9, "safety_tips": "Extremely safe, main concerns are weather-related"},
+            {"name": "Cape Town", "country": "South Africa", "emoji": "🦁", "lat": -33.9249, "lng": 18.4241, "category": ["nature", "adventure", "cultural"], "safety_rating": 3.5, "safety_tips": "Avoid walking alone at night, stay in safe neighborhoods"},
+            {"name": "Maldives", "country": "Maldives", "emoji": "🏖️", "lat": 3.2028, "lng": 73.2207, "category": ["beach", "popular"], "safety_rating": 4.7, "safety_tips": "Very safe resorts, follow water safety guidelines"},
+            {"name": "Bali", "country": "Indonesia", "emoji": "🌺", "lat": -8.3405, "lng": 115.0920, "category": ["beach", "cultural", "nature"], "safety_rating": 4.1, "safety_tips": "Generally safe, be cautious with street food and water"},
+            {"name": "Kyoto", "country": "Japan", "emoji": "🎌", "lat": 35.0116, "lng": 135.7681, "category": ["cultural", "nature"], "safety_rating": 4.8, "safety_tips": "Extremely safe with very low crime rates"},
+            {"name": "Petra", "country": "Jordan", "emoji": "🏜️", "lat": 30.3285, "lng": 35.4444, "category": ["cultural", "adventure"], "safety_rating": 4.0, "safety_tips": "Generally safe, follow tour guides and stay hydrated"},
+            {"name": "Barcelona", "country": "Spain", "emoji": "🏖️", "lat": 41.3851, "lng": 2.1734, "category": ["city", "beach", "cultural"], "safety_rating": 4.1, "safety_tips": "Watch for pickpockets, especially in tourist areas"},
         ]
         
         destinations_with_data = []
@@ -448,8 +408,9 @@ def get_destinations():
                         temp = weather_data.get('main', {}).get('temp', 22)
                         weather = f"{round(temp)}°C, Clear"
                 
-                # Get timezone from Google APIs if available
+                # Get timezone and population from Google APIs if available
                 timezone = "UTC"
+                population = "Unknown"
                 
                 if google_services:
                     # Get location details
@@ -462,14 +423,24 @@ def get_destinations():
                             timezone = tz_data['timeZoneName']
                         else:
                             timezone = str(tz_data)
+                    if 'population' in location_info:
+                        pop_data = location_info['population']
+                        if isinstance(pop_data, (int, float)):
+                            if pop_data >= 1000000:
+                                population = f"{pop_data/1000000:.1f}M"
+                            elif pop_data >= 1000:
+                                population = f"{pop_data/1000:.0f}K"
+                            else:
+                                population = str(int(pop_data))
+                        else:
+                            population = str(pop_data)
                 
                 destination_data = {
                     **dest,
                     'weather': weather,
                     'timezone': timezone,
-                    'area': dest.get('area', 'Area unknown'),
-                    'attractions': dest.get('attractions', 'Multiple attractions'),
-                    'safety_rating': dest.get('safety_rating', '4.0/5'),
+                    'safety_rating': dest.get('safety_rating', 4.0),
+                    'safety_tips': dest.get('safety_tips', 'Follow standard travel safety precautions'),
                     'description': f"Explore the amazing {dest['name']} with its unique culture, attractions, and experiences."
                 }
                 
@@ -481,9 +452,8 @@ def get_destinations():
                     **dest,
                     'weather': 'Data unavailable',
                     'timezone': 'UTC',
-                    'area': dest.get('area', 'Area unknown'),
-                    'attractions': dest.get('attractions', 'Multiple attractions'),
-                    'safety_rating': dest.get('safety_rating', '4.0/5'),
+                    'safety_rating': dest.get('safety_rating', 4.0),
+                    'safety_tips': dest.get('safety_tips', 'Follow standard travel safety precautions'),
                     'description': f"Discover the wonders of {dest['name']}, {dest['country']}."
                 })
         
@@ -736,23 +706,11 @@ def generate_itinerary():
             print("Google services not available for enhanced context")
         
         # Generate itinerary using Gemini
-        try:
-            response = config.gemini_model.generate_content(prompt)
-            if not response or not response.text:
-                raise Exception("Gemini returned empty response")
-            
-            itinerary = response.text
-            print("✅ Itinerary generated successfully")
-        except Exception as gemini_error:
-            print(f"❌ Gemini generation error: {gemini_error}")
-            # Return a fallback error message
-            return jsonify({
-                'success': False,
-                'error': f'AI service error: {str(gemini_error)}. Please try again.'
-            }), 503
+        response = config.gemini_model.generate_content(prompt)
+        itinerary = response.text
         
-        # Format the itinerary for better readability
-        formatted_itinerary = format_itinerary_text(itinerary)
+        # Clean the itinerary text (remove unwanted markdown characters)
+        formatted_itinerary = clean_itinerary_text(itinerary)
         
         return jsonify({
             'success': True,
@@ -771,70 +729,20 @@ def generate_itinerary():
             'error': f'Failed to generate itinerary: {str(e)}'
         }), 500
 
-def format_itinerary_text(text):
-    """Format itinerary text with proper indentation, hyphens, and em dashes for better readability."""
-    
+def clean_itinerary_text(text):
+    """Clean itinerary text by removing unwanted markdown characters, following the example.py approach."""
     import re
     
-    # Replace common markers with em dashes
-    text = re.sub(r'^[\s]*[-*•]\s*', '— ', text, flags=re.MULTILINE)
-    text = re.sub(r'(?<=\n)[\s]*[-*•]\s*', '— ', text)
+    # Remove unwanted characters - same approach as your example.py
+    cleaned_text = re.sub(r'[*\#]', '', text)
     
-    # Format day headers
-    text = re.sub(r'^(Day\s+\d+[:\-\s]*.*?)$', r'<h3 style="color: var(--primary-color); margin: 2rem 0 1rem 0; padding: 0.5rem 0; border-bottom: 2px solid var(--primary-color);">\1</h3>', text, flags=re.MULTILINE | re.IGNORECASE)
+    # Remove any double asterisks that might have been used for bold
+    cleaned_text = re.sub(r'\*\*', '', cleaned_text)
     
-    # Format time-based sections (Morning, Afternoon, Evening)
-    text = re.sub(r'^((?:Morning|Afternoon|Evening|Night)[\s:]*.*?)$', r'<h4 style="color: var(--secondary-color); margin: 1.5rem 0 0.5rem 0; font-weight: 600;">\1</h4>', text, flags=re.MULTILINE | re.IGNORECASE)
+    # Clean up any extra whitespace that might result from character removal
+    cleaned_text = re.sub(r'\n\s*\n\s*\n', '\n\n', cleaned_text)
     
-    # Format activity lines with proper indentation
-    lines = text.split('\n')
-    formatted_lines = []
-    
-    for line in lines:
-        stripped_line = line.strip()
-        
-        if not stripped_line:
-            formatted_lines.append('<br>')
-            continue
-            
-        # Skip lines that are already HTML
-        if stripped_line.startswith('<h'):
-            formatted_lines.append(line)
-            continue
-            
-        # Format bullet points with indentation
-        if stripped_line.startswith('—'):
-            # Main bullet points
-            formatted_line = f'<div style="margin: 0.5rem 0; padding-left: 1rem;">{stripped_line}</div>'
-        elif re.match(r'^\s*[\d]+[\.\)]\s*', stripped_line):
-            # Numbered lists
-            formatted_line = f'<div style="margin: 0.5rem 0; padding-left: 1rem; font-weight: 500;">{stripped_line}</div>'
-        elif re.match(r'^\s*[A-Z][^:]*:', stripped_line):
-            # Category headers (like "Restaurant:", "Activity:", etc.)
-            formatted_line = f'<div style="margin: 0.8rem 0 0.3rem 0; font-weight: 600; color: var(--text-color);">{stripped_line}</div>'
-        else:
-            # Regular text with proper spacing
-            if len(stripped_line) > 80:  # Long paragraphs
-                formatted_line = f'<p style="margin: 1rem 0; line-height: 1.6; text-align: justify;">{stripped_line}</p>'
-            else:  # Short lines
-                formatted_line = f'<div style="margin: 0.3rem 0; padding-left: 0.5rem;">{stripped_line}</div>'
-        
-        formatted_lines.append(formatted_line)
-    
-    # Join all lines
-    formatted_text = '\n'.join(formatted_lines)
-    
-    # Clean up multiple consecutive breaks
-    formatted_text = re.sub(r'(<br>\s*){3,}', '<br><br>', formatted_text)
-    
-    # Add overall container styling
-    formatted_text = f'''
-    <div style="font-family: var(--font-body); color: var(--text-color); line-height: 1.6; max-width: none;">
-        {formatted_text}
-    </div>
-    '''
-    
-    return formatted_text
+    return cleaned_text.strip()
 
 def create_enhanced_itinerary_prompt(destination, start_date, end_date, duration, people, budget, interests, special_requests):
     """Create an enhanced prompt with Google API integration"""
@@ -880,51 +788,22 @@ REQUIREMENTS:
 - Include timing recommendations (morning, afternoon, evening)
 - Add transportation tips between locations for {people_text}
 - Consider group size when recommending accommodations and dining reservations
+- Add simple safety tips in locations that are unsafe and known for theft
 - Mention cultural insights and local tips
 - Consider opening hours and seasonal factors
 - Include approximate time needed for each activity
 - Provide coordinates or addresses for major attractions when possible
 - Mention any group rates or family packages available
 
-HIDDEN GEMS & LOCAL EXPERIENCES:
-- Include at least 2-3 hidden gems or lesser-known attractions per day
-- Recommend local favorites that tourists typically miss
-- Suggest authentic local experiences and off-the-beaten-path locations
-- Include local markets, neighborhood cafes, and community events
-- Mention secret viewpoints, hidden restaurants, and local hangout spots
-- Balance popular attractions with unique, authentic experiences
-
-TRAVEL TIMES & LOGISTICS:
-- Include estimated travel times between each location/activity
-- Specify transportation methods (walk, taxi, metro, bus) with approximate costs
-- Account for realistic travel time including waiting and boarding
-- Group nearby attractions to minimize travel time
-- Suggest optimal routes to reduce backtracking
-- Include buffer time for unexpected delays
-
-SAFETY & SECURITY REQUIREMENTS:
-- Include a dedicated SAFETY SECTION at the end with:
-  * Emergency contact numbers (police, ambulance, tourist helpline)
-  * Common safety concerns and how to avoid them
-  * Safe areas vs areas to avoid, especially at night
-  * Local scams to watch out for
-  * Recommended safety apps or resources
-  * Cultural customs and etiquette to avoid offending locals
-  * Health and medical considerations
-  * Travel insurance recommendations
-- Add safety tips for each day's activities when relevant
-- Mention secure transportation options
-- Highlight any areas known for pickpocketing or tourist scams
-
 FORMAT:
 - Use clear headings for each day
 - Organize activities by time of day
+- Do not include any *, **, or # characters, use indents, hyphens, and em dashes for clearer formatting
+- Make it engaging and informative with natural text formatting
 - Include practical details and insider tips
-- Add a comprehensive SAFETY SECTION at the end
-- Make it engaging and informative
 - Include weather considerations and timezone information when available
 
-Please create a comprehensive, well-structured itinerary that maximizes the travel experience while prioritizing traveler safety and being practical and actionable."""
+Please create a comprehensive, well-structured itinerary that maximizes the travel experience while being practical and actionable."""
 
     return prompt
 
@@ -999,9 +878,8 @@ def internal_error(error):
 
 if __name__ == '__main__':
     import os
-    print(f"🚀 {APP_NAME} - {APP_DESCRIPTION}")
+    print("🚀 go.travel - AI Travel Itinerary Generator")
     print("=" * 50)
-    print(f"📝 Version: {APP_VERSION}")
     print(f"✅ Flask app initialized")
     print(f"✅ Gemini API: {'Available' if config.gemini_model else 'Not Available'}")
     
