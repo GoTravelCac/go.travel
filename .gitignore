@@ -1,22 +1,24 @@
-# go.travel - AI Travel Platform# Logs
+# go.travel - AI Travel Platform
 
-*.pyc*.log
+# Python cache and compiled files
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.so
 
-__pycache__/npm-debug.log*
-
+# Environment variables (sensitive data)
 .env
+.env.local
+.env.production
 
-*.log# Environment variables
+# Logs
+*.log
+logs/
+npm-debug.log*
 
-logs/.env
-
-.DS_Store.env.local
-
-node_modules/.env.production
-
-.vscode/
-
-*.tmp# OS generated files
+# OS generated files
 .DS_Store
 .DS_Store?
 ._*
@@ -31,9 +33,17 @@ Thumbs.db
 *.swp
 *.swo
 
+# Node.js
+node_modules/
+
 # Temporary files
 *.tmp
 *.temp
+
+# Development and test files
+example.py
+test_*.py
+*_test.py
 
 # API Keys (additional protection)
 **/api-keys.js
