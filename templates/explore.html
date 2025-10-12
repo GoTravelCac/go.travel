@@ -82,12 +82,33 @@
     background: var(--white);
     border-radius: 25px;
     cursor: pointer;
+    transition: none;
+}
+
+.filter-btn:hover,
+.filter-btn:focus,
+.filter-btn:active {
+    padding: 0.5rem 1rem;
+    border: 1px solid #e5e7eb;
+    background: var(--white);
+    transform: none;
+    outline: none;
 }
 
 .filter-btn.active {
     background: var(--primary-color);
     color: var(--white);
     border-color: var(--primary-color);
+}
+
+.filter-btn.active:hover,
+.filter-btn.active:focus,
+.filter-btn.active:active {
+    background: var(--primary-color);
+    color: var(--white);
+    border-color: var(--primary-color);
+    transform: none;
+    outline: none;
 }
 
 .temp-toggle {
@@ -169,6 +190,17 @@ input:checked + .temp-slider .temp-unit-right {
     overflow: hidden;
     box-shadow: var(--shadow-md);
     cursor: pointer;
+    transition: none;
+}
+
+.destination-card:hover,
+.destination-card:focus,
+.destination-card:active {
+    background: var(--white);
+    box-shadow: var(--shadow-md);
+    transform: none;
+    transition: none;
+    outline: none;
 }
 
 .destination-header {
@@ -248,6 +280,14 @@ input:checked + .temp-slider .temp-unit-right {
     border-radius: 8px;
     cursor: pointer;
     font-weight: 600;
+    transition: none;
+}
+
+.action-btn:hover,
+.action-btn:focus,
+.action-btn:active {
+    transform: none;
+    outline: none;
 }
 
 .btn-primary {
@@ -255,10 +295,29 @@ input:checked + .temp-slider .temp-unit-right {
     color: var(--white);
 }
 
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active {
+    background: var(--primary-color);
+    color: var(--white);
+    transform: none;
+    outline: none;
+}
+
 .btn-secondary {
     background: var(--background-color);
     color: var(--text-color);
     border: 1px solid #e5e7eb;
+}
+
+.btn-secondary:hover,
+.btn-secondary:focus,
+.btn-secondary:active {
+    background: var(--background-color);
+    color: var(--text-color);
+    border: 1px solid #e5e7eb;
+    transform: none;
+    outline: none;
 }
 
 
@@ -326,6 +385,30 @@ input:checked + .temp-slider .temp-unit-right {
     border-radius: 6px;
     cursor: pointer;
     font-size: 0.9rem;
+    transition: none;
+}
+
+.copy-button:hover,
+.copy-button:focus,
+.copy-button:active {
+    background: var(--secondary-color);
+    color: var(--white);
+    transform: none;
+    outline: none;
+}
+
+/* Global button hover state removal */
+button:hover,
+button:focus,
+button:active,
+button:visited {
+    transform: none !important;
+    transition: none !important;
+    outline: none !important;
+}
+
+button {
+    transition: none !important;
 }
 {% endblock %}
 
