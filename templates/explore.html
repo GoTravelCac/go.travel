@@ -24,73 +24,6 @@
     margin-bottom: 1rem;
 }
 
-.search-section {
-    background: var(--white);
-    padding: 2rem 0;
-    border-bottom: 1px solid #e5e7eb;
-}
-
-.search-container {
-    max-width: 600px;
-    margin: 0 auto;
-    position: relative;
-}
-
-.search-input {
-    width: 100%;
-    padding: 1rem 1.5rem;
-    border: 2px solid #e5e7eb;
-    border-radius: 50px;
-    font-size: 1.1rem;
-}
-
-.search-input:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-}
-
-.search-btn {
-    position: absolute;
-    right: 8px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: var(--primary-color);
-    color: var(--white);
-    border: none;
-    padding: 0.75rem 1.5rem;
-    border-radius: 50px;
-    cursor: pointer;
-    height: 48px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: none;
-}
-
-.search-btn:hover,
-.search-btn:focus,
-.search-btn:active,
-.search-btn:visited {
-    position: absolute;
-    right: 8px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: var(--primary-color);
-    color: var(--white);
-    border: none;
-    padding: 0.75rem 1.5rem;
-    border-radius: 50px;
-    cursor: pointer;
-    height: 48px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: none;
-    outline: none;
-    box-shadow: none;
-}
-
 .filters {
     display: flex;
     justify-content: center;
@@ -444,13 +377,9 @@ button {
     </div>
 </section>
 
-<!-- Search Section -->
-<section class="search-section">
+<!-- Filter Section -->
+<section class="filter-section" style="background: var(--white); padding: 2rem 0; border-bottom: 1px solid #e5e7eb;">
     <div class="container">
-        <div class="search-container">
-            <input type="text" class="search-input" id="searchInput" placeholder="Search for destinations, countries, or cities...">
-            <button class="search-btn" onclick="searchDestinations()">🔍</button>
-        </div>
         <div class="filters">
             <button class="filter-btn active" data-filter="all">All</button>
             <button class="filter-btn" data-filter="popular">Popular</button>
@@ -517,7 +446,6 @@ let currentFilter = 'all';
 document.addEventListener('DOMContentLoaded', function() {
     loadDestinations();
     setupFilters();
-    setupSearch();
 });
 
 // Load destinations from API
@@ -648,39 +576,6 @@ function filterDestinations() {
             dest.category.includes(currentFilter)
         );
     }
-    
-    displayDestinations(filtered);
-}
-
-// Setup search
-function setupSearch() {
-    const searchInput = document.getElementById('searchInput');
-    searchInput.addEventListener('input', function() {
-        searchDestinations();
-    });
-    
-    searchInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            searchDestinations();
-        }
-    });
-}
-
-// Search destinations
-function searchDestinations() {
-    const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
-    
-    if (searchTerm === '') {
-        filterDestinations();
-        return;
-    }
-    
-    const filtered = allDestinations.filter(dest => 
-        dest.name.toLowerCase().includes(searchTerm) ||
-        dest.country.toLowerCase().includes(searchTerm) ||
-        dest.description.toLowerCase().includes(searchTerm) ||
-        dest.category.some(cat => cat.toLowerCase().includes(searchTerm))
-    );
     
     displayDestinations(filtered);
 }
