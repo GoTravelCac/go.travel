@@ -42,8 +42,8 @@ class Config:
         
         try:
             genai.configure(api_key=self.gemini_api_key)
-            self.gemini_model = genai.GenerativeModel('gemini-2.0-flash-exp')
-            print("✅ Gemini 2.0 Flash model initialized successfully")
+            self.gemini_model = genai.GenerativeModel('gemini-2.5-flash')
+            print("✅ Gemini 2.5 Flash model initialized successfully")
         except Exception as e:
             print(f"❌ Gemini initialization error: {e}")
             # Fallback to gemini-pro if 2.0 flash is not available
@@ -367,7 +367,7 @@ def api_status():
         'status': 'online',
         'google_services_available': google_services is not None,
         'timestamp': datetime.now().isoformat(),
-        'model': 'gemini-2.0-flash-exp' if config.gemini_model else None
+        'model': 'gemini-2.5-flash' if config.gemini_model else None
     })
     return jsonify(status)
 
