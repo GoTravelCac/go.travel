@@ -198,6 +198,95 @@
 .formatted-itinerary {
     max-width: 100%;
     overflow-x: auto;
+    line-height: 1.6;
+    color: var(--text-primary);
+}
+
+/* Enhanced Itinerary Structure */
+.day-header {
+    background: linear-gradient(135deg, var(--primary-color), #2563eb);
+    color: white;
+    padding: 1rem;
+    border-radius: var(--border-radius);
+    margin: 1.5rem 0 1rem 0;
+    box-shadow: var(--shadow-md);
+}
+
+.day-header h3 {
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+.time-block {
+    background: var(--white);
+    border: 1px solid #e5e7eb;
+    border-radius: var(--border-radius);
+    margin: 1rem 0;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+}
+
+.time-header {
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.time-content {
+    padding: 1rem;
+}
+
+.activity-item {
+    background: #fafbfc;
+    border-left: 3px solid var(--accent-color);
+    margin: 0.75rem 0;
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    overflow: hidden;
+}
+
+.activity-title {
+    background: var(--white);
+    padding: 0.75rem 1rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.activity-details {
+    padding: 1rem;
+    line-height: 1.5;
+}
+
+.location-info, .cost-info, .tip-info, .transport-info {
+    padding: 0.5rem 0.75rem;
+    margin: 0.5rem 0;
+    border-radius: var(--border-radius);
+    font-size: 0.9rem;
+}
+
+.location-info {
+    background: #f0f9ff;
+    border-left: 3px solid #0ea5e9;
+    color: #0c4a6e;
+}
+
+.cost-info {
+    background: #f0fdf4;
+    border-left: 3px solid #22c55e;
+    color: #14532d;
+}
+
+.tip-info {
+    background: #fffbeb;
+    border-left: 3px solid #f59e0b;
+    color: #92400e;
+}
+
+.transport-info {
+    background: #fdf4ff;
+    border-left: 3px solid #a855f7;
+    color: #581c87;
 }
 
 .itinerary-content p {
@@ -517,6 +606,11 @@ button:disabled {
         <div class="location-map">
             <h5>📍 Location Preview</h5>
             <div id="location-map" style="height: 300px; border-radius: 8px;"></div>
+            <div class="location-tip">
+                <p style="text-align: center; margin-top: 1rem; color: var(--text-muted); font-size: 0.9rem;">
+                    💡 <strong>Tip:</strong> Explore the map and try entering more specific locations (like neighborhoods or districts) for a more detailed and personalized itinerary!
+                </p>
+            </div>
         </div>
     </div>
 
@@ -538,9 +632,8 @@ button:disabled {
                     <button class="action-btn primary" onclick="refineItinerary()">Update Itinerary</button>
                 </div>
                 <div class="management-card">
-                    <h4>📤 Share & Export</h4>
+                    <h4>📤 Save & Export</h4>
                     <div class="action-buttons">
-                        <button class="action-btn secondary" onclick="shareItinerary()">🔗 Share</button>
                         <button class="action-btn secondary" onclick="downloadText()">📄 Download</button>
                         <button class="action-btn secondary" onclick="copyItinerary()">📋 Copy</button>
                     </div>
@@ -882,20 +975,20 @@ function formatItinerary(itinerary) {
         .replace(/\*\*/g, '') 
         .replace(/\*/g, '') 
         
-        // Format day headers
-        .replace(/Day (\d+):/g, '<h3>📅 Day $1</h3>')
+        // Format day headers with better styling
+        .replace(/Day (\d+):/g, '<div class="day-header"><h3>📅 Day $1</h3></div>')
         
-        // Format time periods (Morning, Afternoon, Evening)
+        // Format time periods with enhanced structure
         .replace(/(Morning|Afternoon|Evening|Lunch|Dinner|Breakfast)\s*\(([^)]+)\):/g, 
-            '<div class="time-block"><strong>🕐 $1 ($2)</strong>')
+            '<div class="time-block"><div class="time-header"><strong>🕐 $1 ($2)</strong></div><div class="time-content">')
         .replace(/(Morning|Afternoon|Evening|Lunch|Dinner|Breakfast):/g, 
-            '<div class="time-block"><strong>🕐 $1</strong>')
+            '<div class="time-block"><div class="time-header"><strong>🕐 $1</strong></div><div class="time-content">')
         
-        // Format activities with bullet points
-        .replace(/^[\s]*-\s*([^:]+):\s*/gm, '<div class="activity"><strong>$1:</strong><br>')
+        // Format activities and attractions with better structure
+        .replace(/^[\s]*-\s*([^:]+):\s*/gm, '<div class="activity-item"><div class="activity-title">$1</div><div class="activity-details">')
         
         // Format addresses and locations
-        .replace(/Address:\s*([^\n]+)/g, '<div class="location">📍 $1</div>')
+        .replace(/Address:\s*([^\n]+)/g, '        .replace(/Transportation:\s*([^\n]+)/gi, '<div class="transport-info">� $1</div>')')
         
         // Format costs
         .replace(/(?:Estimated cost|Cost)\s*(?:for \d+)?:\s*([^\n]+)/gi, '<div class="cost">💰 $1</div>')
@@ -1027,72 +1120,78 @@ function getPlainTextItinerary() {
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = currentItinerary;
     
-    // Convert HTML to clean plain text
+    // Get the raw text content
     let plainText = tempDiv.textContent || tempDiv.innerText || '';
     
-    // Additional formatting for better readability
+    // Enhanced formatting for much better readability
     plainText = plainText
-        // Clean up excessive whitespace
+        // Clean up excessive whitespace first
         .replace(/\s+/g, ' ')
-        .replace(/\n\s+/g, '\n')
-        // Add proper spacing around day headers
-        .replace(/(Day\s+\d+[:\s]*[^\n]*)/gi, '\n\n📅 $1\n')
-        // Add spacing around time periods
-        .replace(/(Morning|Afternoon|Evening|Night)[:\s]*([^\n]*)/gi, '\n� $1: $2\n')
-        // Format bullet points
-        .replace(/—\s*/g, '\n• ')
-        // Clean up multiple newlines
-        .replace(/\n{3,}/g, '\n\n')
+        .trim()
+        
+        // Format day headers with proper spacing and styling
+        .replace(/(Day\s+\d+)/gi, '\n\n' + '='.repeat(50) + '\n📅 $1\n' + '='.repeat(50))
+        
+        // Format time periods with better structure
+        .replace(/(Morning|Afternoon|Evening|Lunch|Dinner|Breakfast)\s*(\([^)]*\))?/gi, '\n\n🕐 $1 $2\n' + '-'.repeat(30))
+        
+        // Format activities and attractions
+        .replace(/([^.\n]+(?:Activity|Visit|Explore|Experience)[^.\n]*)/gi, '\n\n🎯 $1')
+        
+        // Format locations and addresses
+        .replace(/📍\s*([^.\n]+)/gi, '\n   📍 Location: $1')
+        
+        // Format costs and pricing
+        .replace(/💰\s*([^.\n]+)/gi, '\n   💰 Cost: $1')
+        
+        // Format tips and insights
+        .replace(/💡\s*([^.\n]+)/gi, '\n   💡 Tip: $1')
+        
+        // Format transportation
+        .replace(/🚗\s*([^.\n]+)/gi, '\n   🚗 Transportation: $1')
+        
+        // Format restaurants and food
+        .replace(/([^.\n]*(?:restaurant|café|food|dining|eat)[^.\n]*)/gi, '\n\n🍽️ $1')
+        
+        // Add proper line breaks for better readability
+        .replace(/\.\s*/g, '.\n   ')
+        
+        // Clean up multiple newlines but preserve intentional spacing
+        .replace(/\n{4,}/g, '\n\n\n')
+        .replace(/\n{2,}([🕐📅])/g, '\n\n$1')
+        
+        // Clean up trailing whitespace
+        .replace(/[ \t]+$/gm, '')
         .trim();
     
-    // Add header info if available
-    const headerInfo = `🌍 TRAVEL ITINERARY\n${currentDestination ? `📍 Destination: ${currentDestination}` : ''}\n${currentItinerary.includes('duration') ? '' : ''}\n${'='.repeat(50)}\n\n`;
+    // Create a nicely formatted header
+    const currentDate = new Date().toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+    });
     
-    const finalText = headerInfo + plainText + '\n\n' + '='.repeat(50) + '\n✨ Generated by go.travel - AI Travel Planner\n🌐 https://gotravel-ai-407949658262.us-central1.run.app';
+    const headerInfo = `${'='.repeat(60)}
+🌍 PERSONALIZED TRAVEL ITINERARY
+${'='.repeat(60)}
+
+📍 Destination: ${currentDestination || 'Your Travel Destination'}
+📅 Generated: ${currentDate}
+✨ Created by: go.travel AI Travel Planner
+
+${'-'.repeat(60)}\n\n`;
+    
+    // Create a nice footer
+    const footerInfo = `\n\n${'-'.repeat(60)}
+✨ Thank you for using go.travel!
+🌐 Visit us: https://gotravel-app-407949658262.us-central1.run.app
+📱 Plan your next adventure with AI assistance
+${'='.repeat(60)}`;
+    
+    const finalText = headerInfo + plainText + footerInfo;
     
     console.log('Converted itinerary preview:', finalText.substring(0, 300) + '...');
     return finalText;
-}
-
-function shareItinerary() {
-    if (!currentItinerary) {
-        showMessage('No itinerary to share. Please generate one first.', 'error');
-        return;
-    }
-    
-    const plainText = getPlainTextItinerary();
-    
-    if (!plainText || plainText.trim() === '') {
-        showMessage('Unable to share itinerary. Please try generating a new one.', 'error');
-        return;
-    }
-    
-    const safeDestination = currentDestination || 'Travel Destination';
-    
-    if (navigator.share) {
-        navigator.share({
-            title: `My ${safeDestination} Travel Itinerary`,
-            text: plainText,
-            url: window.location.href
-        }).then(() => {
-            showMessage('Itinerary shared successfully!', 'success');
-        }).catch((error) => {
-            console.log('Share failed, falling back to clipboard:', error);
-            // Fallback to clipboard
-            navigator.clipboard.writeText(plainText).then(() => {
-                showMessage('Itinerary copied to clipboard!', 'success');
-            }).catch(() => {
-                showMessage('Unable to share or copy. Please copy manually.', 'error');
-            });
-        });
-    } else {
-        // Fallback: copy to clipboard
-        navigator.clipboard.writeText(plainText).then(() => {
-            showMessage('Itinerary copied to clipboard!', 'success');
-        }).catch(() => {
-            showMessage('Unable to copy to clipboard. Please copy manually.', 'error');
-        });
-    }
 }
 
 function downloadText() {
