@@ -195,98 +195,125 @@
     color: #92400e;
 }
 
+/* Clean Itinerary Formatting */
 .formatted-itinerary {
     max-width: 100%;
     overflow-x: auto;
     line-height: 1.6;
     color: var(--text-primary);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
-/* Enhanced Itinerary Structure */
-.day-header {
-    background: linear-gradient(135deg, var(--primary-color), #2563eb);
-    color: white;
-    padding: 1rem;
-    border-radius: var(--border-radius);
-    margin: 1.5rem 0 1rem 0;
-    box-shadow: var(--shadow-md);
-}
-
-.day-header h3 {
-    margin: 0;
-    font-size: 1.3rem;
-    font-weight: 600;
-}
-
-.time-block {
+/* Day Sections */
+.day-section {
     background: var(--white);
     border: 1px solid #e5e7eb;
-    border-radius: var(--border-radius);
+    border-radius: 12px;
+    margin: 1.5rem 0;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.day-title {
+    background: linear-gradient(135deg, var(--primary-color), #2563eb);
+    color: white;
+    margin: 0;
+    padding: 1rem 1.5rem;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.day-content {
+    padding: 1.5rem;
+}
+
+/* Time Periods */
+.time-period {
+    background: #f8fafc;
+    border-radius: 8px;
     margin: 1rem 0;
     overflow: hidden;
-    box-shadow: var(--shadow-sm);
+    border: 1px solid #e2e8f0;
 }
 
-.time-header {
-    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
-    padding: 0.75rem 1rem;
-    border-bottom: 1px solid #e5e7eb;
-}
-
-.time-content {
-    padding: 1rem;
-}
-
-.activity-item {
-    background: #fafbfc;
-    border-left: 3px solid var(--accent-color);
-    margin: 0.75rem 0;
-    border-radius: 0 var(--border-radius) var(--border-radius) 0;
-    overflow: hidden;
-}
-
-.activity-title {
-    background: var(--white);
-    padding: 0.75rem 1rem;
-    font-weight: 600;
+.time-title {
+    background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
     color: var(--primary-color);
-    border-bottom: 1px solid #e5e7eb;
+    margin: 0;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border-bottom: 1px solid #cbd5e1;
 }
 
-.activity-details {
+.activities {
     padding: 1rem;
-    line-height: 1.5;
 }
 
-.location-info, .cost-info, .tip-info, .transport-info {
-    padding: 0.5rem 0.75rem;
+/* Individual Activities */
+.activity {
+    background: var(--white);
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    margin: 0.75rem 0;
+    overflow: hidden;
+    transition: box-shadow 0.2s ease;
+}
+
+.activity:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.activity-name {
+    background: var(--white);
+    color: var(--primary-color);
+    margin: 0;
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.activity-info {
+    padding: 1rem;
+}
+
+/* Information Types */
+.activity-info p {
     margin: 0.5rem 0;
-    border-radius: var(--border-radius);
+    padding: 0.5rem 0.75rem;
+    border-radius: 4px;
     font-size: 0.9rem;
+    line-height: 1.4;
 }
 
-.location-info {
+.address {
     background: #f0f9ff;
-    border-left: 3px solid #0ea5e9;
     color: #0c4a6e;
+    border-left: 3px solid #0ea5e9;
 }
 
-.cost-info {
+.cost {
     background: #f0fdf4;
-    border-left: 3px solid #22c55e;
     color: #14532d;
+    border-left: 3px solid #22c55e;
 }
 
-.tip-info {
+.tip {
     background: #fffbeb;
-    border-left: 3px solid #f59e0b;
     color: #92400e;
+    border-left: 3px solid #f59e0b;
 }
 
-.transport-info {
+.transport {
     background: #fdf4ff;
-    border-left: 3px solid #a855f7;
     color: #581c87;
+    border-left: 3px solid #a855f7;
+}
+
+.description {
+    color: var(--text-primary);
+    line-height: 1.5;
 }
 
 /* Map Links */
@@ -300,8 +327,8 @@
 .map-link:hover {
     text-decoration: none;
     border-bottom: 1px solid currentColor;
-    background: rgba(255, 255, 255, 0.3);
-    padding: 1px 3px;
+    background: rgba(255, 255, 255, 0.5);
+    padding: 2px 4px;
     border-radius: 3px;
     cursor: pointer;
 }
@@ -992,7 +1019,79 @@ function addMapLinksToContent(content) {
     });
 }
 
-// Format itinerary
+// Clean itinerary formatting function
+function formatItinerary(itinerary) {
+    currentItinerary = itinerary;
+    
+    // Split into lines and process line by line for clean formatting
+    const lines = itinerary.split('\n');
+    let html = '';
+    let inDay = false;
+    let inTimePeriod = false;
+    let inActivity = false;
+    
+    for (let line of lines) {
+        line = line.trim();
+        if (!line) continue;
+        
+        // Remove markdown formatting
+        line = line.replace(/^#+\s*/, '').replace(/\*\*/g, '').replace(/\*/g, '');
+        
+        // Day headers
+        if (line.match(/^Day \d+/i)) {
+            // Close previous sections
+            if (inActivity) { html += '</div></div>'; inActivity = false; }
+            if (inTimePeriod) { html += '</div></div>'; inTimePeriod = false; }
+            if (inDay) { html += '</div></div>'; }
+            
+            html += `<div class="day-section"><h3 class="day-title">📅 ${line}</h3><div class="day-content">`;
+            inDay = true;
+        }
+        // Time periods
+        else if (line.match(/^(Morning|Afternoon|Evening|Night|Breakfast|Lunch|Dinner)/i)) {
+            if (inActivity) { html += '</div></div>'; inActivity = false; }
+            if (inTimePeriod) { html += '</div></div>'; }
+            
+            const icon = line.match(/Breakfast|Lunch|Dinner/i) ? '🍽️' : '🕐';
+            html += `<div class="time-period"><h4 class="time-title">${icon} ${line.replace(':', '')}</h4><div class="activities">`;
+            inTimePeriod = true;
+        }
+        // Activities
+        else if (line.match(/^[-•]\s*(.+?):/)) {
+            if (inActivity) { html += '</div></div>'; }
+            
+            const activityName = line.replace(/^[-•]\s*/, '').replace(':', '');
+            html += `<div class="activity"><h5 class="activity-name">${activityName}</h5><div class="activity-info">`;
+            inActivity = true;
+        }
+        // Information details
+        else if (line.match(/^(Address|Cost|Price|Tip|Transportation):/i)) {
+            const parts = line.split(':');
+            const type = parts[0].toLowerCase().trim();
+            const content = parts.slice(1).join(':').trim();
+            let icon = '📍', className = 'address';
+            
+            if (type.includes('cost') || type.includes('price')) { icon = '💰'; className = 'cost'; }
+            else if (type.includes('tip')) { icon = '💡'; className = 'tip'; }
+            else if (type.includes('transport')) { icon = '🚗'; className = 'transport'; }
+            
+            html += `<p class="${className}">${icon} ${content}</p>`;
+        }
+        // Regular content
+        else if (line.length > 0) {
+            html += `<p class="description">${line}</p>`;
+        }
+    }
+    
+    // Close any remaining open tags
+    if (inActivity) html += '</div></div>';
+    if (inTimePeriod) html += '</div></div>';
+    if (inDay) html += '</div></div>';
+    
+    return `<div class="formatted-itinerary">${addMapLinksToContent(html)}</div>`;
+}
+
+// OLD BROKEN FUNCTION BELOW - WILL BE REMOVED
 function formatItinerary(itinerary) {
     currentItinerary = itinerary;
     
