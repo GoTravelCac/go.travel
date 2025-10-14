@@ -191,6 +191,10 @@ class WeatherService:
     
     def get_current_weather(self, lat, lng):
         """Get current weather for coordinates"""
+        # If no valid API key, return fallback immediately
+        if not self.api_key or self.api_key == "fallback":
+            return self._get_fallback_weather()
+            
         try:
             params = {
                 'lat': lat,
@@ -308,16 +312,16 @@ config = Config()
 
 # Initialize Google services with proper error handling
 try:
-    if config.google_api_key and config.openweathermap_api_key:
-        google_services = GoogleServicesManager(config.google_api_key, config.openweathermap_api_key)
+    if config.google_api_key:
+        # Initialize with or without OpenWeatherMap API
+        openweather_key = config.openweathermap_api_key or "fallback"  # Use fallback if no key
+        google_services = GoogleServicesManager(config.google_api_key, openweather_key)
         print("✅ Google services initialized successfully")
+        if not config.openweathermap_api_key:
+            print("⚠️ OpenWeatherMap API key not provided - using fallback weather data")
     else:
         google_services = None
-        print("❌ Missing API keys - Google services not available")
-        if not config.google_api_key:
-            print("   Missing GOOGLE_API_KEY")
-        if not config.openweathermap_api_key:
-            print("   Missing OPENWEATHERMAP_API_KEY")
+        print("❌ Missing GOOGLE_API_KEY - Google services not available")
 except Exception as e:
     google_services = None
     print(f"❌ Failed to initialize Google services: {e}")
