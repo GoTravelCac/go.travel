@@ -289,6 +289,23 @@
     color: #581c87;
 }
 
+/* Map Links */
+.map-link {
+    color: inherit !important;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border-bottom: 1px dashed currentColor;
+}
+
+.map-link:hover {
+    text-decoration: none;
+    border-bottom: 1px solid currentColor;
+    background: rgba(255, 255, 255, 0.3);
+    padding: 1px 3px;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
 .itinerary-content p {
     margin: 0.75rem 0;
     line-height: 1.7;
@@ -656,6 +673,7 @@ let map;
 let autocomplete;
 let currentItinerary = '';
 let currentDestination = '';
+let currentLocationInfo = null; // Store location info for updates
 
 // Initialize page when Google Maps API is ready
 function initializePage() {
@@ -878,6 +896,7 @@ document.getElementById('tripForm').addEventListener('submit', async function(e)
                     // Format itinerary with location information
                     let fullItinerary = formatItinerary(data.itinerary);
                     if (data.location_info) {
+                        currentLocationInfo = data.location_info; // Store for future updates
                         fullItinerary = addLocationInfoToItinerary(data.location_info) + fullItinerary;
                     }
                     itineraryContent.innerHTML = fullItinerary;
@@ -964,6 +983,15 @@ function addLocationInfoToItinerary(data) {
     return locationHTML;
 }
 
+// Helper function to add clickable map links to addresses
+function addMapLinksToContent(content) {
+    return content.replace(/(<div class="location-info">📍 )([^<]+)(<\/div>)/gi, function(match, prefix, address, suffix) {
+        const cleanAddress = address.trim();
+        const mapsUrl = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(cleanAddress);
+        return prefix + '<a href="' + mapsUrl + '" target="_blank" class="map-link">' + cleanAddress + '</a>' + suffix;
+    });
+}
+
 // Format itinerary
 function formatItinerary(itinerary) {
     currentItinerary = itinerary;
@@ -1007,7 +1035,7 @@ function formatItinerary(itinerary) {
         .replace(/\n\n/g, '</p><p>')
         .replace(/\n/g, '<br>');
     
-    return `<div class="formatted-itinerary">${formatted}</div>`;
+    return `<div class="formatted-itinerary">${addMapLinksToContent(formatted)}</div>`;
 }
 
 // Itinerary management functions
@@ -1066,9 +1094,16 @@ async function refineItinerary() {
                 itineraryContent.style.opacity = '0';
                 
                 setTimeout(() => {
-                    // Update the display with new itinerary
-                    itineraryContent.innerHTML = formatItinerary(data.itinerary);
+                    // Update the display with new itinerary, preserving location info
+                    let fullItinerary = formatItinerary(data.itinerary);
+                    if (currentLocationInfo) {
+                        fullItinerary = addLocationInfoToItinerary(currentLocationInfo) + fullItinerary;
+                    }
+                    itineraryContent.innerHTML = fullItinerary;
                     itineraryContent.style.opacity = '1';
+                    
+                    // Ensure management section is still visible
+                    document.getElementById('itineraryManagement').style.display = 'block';
                     
                     // Update the current itinerary variable for future operations
                     currentItinerary = data.itinerary;
@@ -1099,7 +1134,11 @@ async function refineItinerary() {
         // Restore original itinerary on error
         itineraryContent.style.opacity = '0';
         setTimeout(() => {
-            itineraryContent.innerHTML = formatItinerary(currentItinerary);
+            let fullItinerary = formatItinerary(currentItinerary);
+            if (currentLocationInfo) {
+                fullItinerary = addLocationInfoToItinerary(currentLocationInfo) + fullItinerary;
+            }
+            itineraryContent.innerHTML = fullItinerary;
             itineraryContent.style.opacity = '1';
         }, 300);
     } finally {
