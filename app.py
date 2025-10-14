@@ -108,19 +108,11 @@ class GoogleAPIService:
                 params = {}
             params['key'] = self.api_key
             
-            url = f"{self.base_url}/{endpoint}"
-            print(f"Making API request to: {url}")
-            print(f"With params: {params}")
-            
-            response = requests.get(url, params=params, timeout=10)
-            print(f"Response status: {response.status_code}")
-            
+            response = requests.get(f"{self.base_url}/{endpoint}", params=params, timeout=15)
             if response.status_code == 200:
-                result = response.json()
-                print(f"API response: {result}")
-                return result
+                return response.json()
             else:
-                print(f"API error: {response.status_code} - {response.text}")
+                print(f"API error: {response.status_code}")
                 return {"error": f"API error: {response.status_code}"}
                 
         except requests.exceptions.RequestException as e:
@@ -205,7 +197,6 @@ class WeatherService:
         """Get current weather for coordinates"""
         # If no valid API key, return fallback immediately
         if not self.api_key or self.api_key == "fallback":
-            print("Using fallback weather - no OpenWeatherMap API key")
             return self._get_fallback_weather()
             
         try:
@@ -215,18 +206,11 @@ class WeatherService:
                 'appid': self.api_key,
                 'units': 'metric'
             }
-            url = f"{self.base_url}/weather"
-            print(f"OpenWeatherMap request: {url} with params: {params}")
-            
-            response = requests.get(url, params=params, timeout=10)
-            print(f"OpenWeatherMap response status: {response.status_code}")
-            
+            response = requests.get(f"{self.base_url}/weather", params=params, timeout=15)
             if response.status_code == 200:
-                result = response.json()
-                print(f"OpenWeatherMap data: {result}")
-                return result
+                return response.json()
             else:
-                print(f"OpenWeatherMap API error: {response.status_code} - {response.text}")
+                print(f"OpenWeatherMap API error: {response.status_code}")
                 return self._get_fallback_weather()
         except Exception as e:
             print(f"Weather API error: {e}")
@@ -294,34 +278,25 @@ class GoogleServicesManager:
     def get_location_info(self, location_query):
         """Get comprehensive information about a location"""
         try:
-            print(f"Getting location info for: {location_query}")
-            
             # Step 1: Geocode the location
             geocode_result = self.geocoding.get_coordinates(location_query)
-            print(f"Geocoding result: {geocode_result}")
-            
             if 'error' in geocode_result or 'results' not in geocode_result or not geocode_result['results']:
-                print("Geocoding failed")
                 return {"error": "Location not found"}
             
             location_data = geocode_result['results'][0]
             lat = location_data['geometry']['location']['lat']
             lng = location_data['geometry']['location']['lng']
             formatted_address = location_data['formatted_address']
-            print(f"Coordinates: {lat}, {lng}")
             
             # Step 2: Get additional information
             timezone_info = self.timezone.get_timezone(lat, lng)
-            print(f"Timezone info: {timezone_info}")
-            
             weather_info = self.weather.get_current_weather(lat, lng)
-            print(f"Weather info: {weather_info}")
             
             # Step 3: Find nearby attractions
             attractions = self.places.search_nearby(lat, lng, 'tourist_attraction')
             restaurants = self.places.search_nearby(lat, lng, 'restaurant')
             
-            result = {
+            return {
                 'location': {
                     'address': formatted_address,
                     'coordinates': {'lat': lat, 'lng': lng}
@@ -333,8 +308,6 @@ class GoogleServicesManager:
                     'restaurants': restaurants
                 }
             }
-            print(f"Final location info result: {result}")
-            return result
             
         except Exception as e:
             print(f"Error in get_location_info: {e}")
