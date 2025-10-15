@@ -137,7 +137,6 @@
     line-height: 1.8;
     color: var(--text-color);
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    transition: opacity 0.3s ease, filter 0.3s ease;
 }
 
 .itinerary-content h3 {
@@ -195,142 +194,9 @@
     color: #92400e;
 }
 
-/* Clean Itinerary Formatting */
 .formatted-itinerary {
     max-width: 100%;
     overflow-x: auto;
-    line-height: 1.6;
-    color: var(--text-primary);
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-}
-
-/* Day Sections */
-.day-section {
-    background: var(--white);
-    border: 1px solid #e5e7eb;
-    border-radius: 12px;
-    margin: 1.5rem 0;
-    overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-.day-title {
-    background: linear-gradient(135deg, var(--primary-color), #2563eb);
-    color: white;
-    margin: 0;
-    padding: 1rem 1.5rem;
-    font-size: 1.25rem;
-    font-weight: 600;
-}
-
-.day-content {
-    padding: 1.5rem;
-}
-
-/* Time Periods */
-.time-period {
-    background: #f8fafc;
-    border-radius: 8px;
-    margin: 1rem 0;
-    overflow: hidden;
-    border: 1px solid #e2e8f0;
-}
-
-.time-title {
-    background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
-    color: var(--primary-color);
-    margin: 0;
-    padding: 0.75rem 1rem;
-    font-size: 1rem;
-    font-weight: 600;
-    border-bottom: 1px solid #cbd5e1;
-}
-
-.activities {
-    padding: 1rem;
-}
-
-/* Individual Activities */
-.activity {
-    background: var(--white);
-    border: 1px solid #e2e8f0;
-    border-radius: 6px;
-    margin: 0.75rem 0;
-    overflow: hidden;
-    transition: box-shadow 0.2s ease;
-}
-
-.activity:hover {
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-.activity-name {
-    background: var(--white);
-    color: var(--primary-color);
-    margin: 0;
-    padding: 0.75rem 1rem;
-    font-size: 0.95rem;
-    font-weight: 600;
-    border-bottom: 1px solid #f1f5f9;
-}
-
-.activity-info {
-    padding: 1rem;
-}
-
-/* Information Types */
-.activity-info p {
-    margin: 0.5rem 0;
-    padding: 0.5rem 0.75rem;
-    border-radius: 4px;
-    font-size: 0.9rem;
-    line-height: 1.4;
-}
-
-.address {
-    background: #f0f9ff;
-    color: #0c4a6e;
-    border-left: 3px solid #0ea5e9;
-}
-
-.cost {
-    background: #f0fdf4;
-    color: #14532d;
-    border-left: 3px solid #22c55e;
-}
-
-.tip {
-    background: #fffbeb;
-    color: #92400e;
-    border-left: 3px solid #f59e0b;
-}
-
-.transport {
-    background: #fdf4ff;
-    color: #581c87;
-    border-left: 3px solid #a855f7;
-}
-
-.description {
-    color: var(--text-primary);
-    line-height: 1.5;
-}
-
-/* Map Links */
-.map-link {
-    color: inherit !important;
-    text-decoration: none;
-    transition: all 0.2s ease;
-    border-bottom: 1px dashed currentColor;
-}
-
-.map-link:hover {
-    text-decoration: none;
-    border-bottom: 1px solid currentColor;
-    background: rgba(255, 255, 255, 0.5);
-    padding: 2px 4px;
-    border-radius: 3px;
-    cursor: pointer;
 }
 
 .itinerary-content p {
@@ -347,22 +213,184 @@
     display: none;
 }
 
-/* Loading Animation */
+.maps-link {
+    display: inline-block;
+    margin-left: 0.5rem;
+    padding: 0.25rem 0.5rem;
+    background: #3b82f6;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+.maps-link:hover {
+    background: #2563eb;
+    color: white;
+}
+
+.safety-header {
+    color: #dc2626 !important;
+    background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+    border-left: 4px solid #dc2626;
+    margin: 2rem 0 1rem 0 !important;
+    padding: 1rem !important;
+    border-radius: 0 8px 8px 0;
+}
+
+.safety-warning {
+    background: #fef3c7;
+    border: 1px solid #f59e0b;
+    color: #92400e;
+    padding: 0.75rem;
+    border-radius: 6px;
+    margin: 0.5rem 0;
+    font-weight: 500;
+}
+
+.emergency-contact {
+    background: #fee2e2;
+    border: 1px solid #dc2626;
+    color: #991b1b;
+    padding: 0.75rem;
+    border-radius: 6px;
+    margin: 0.5rem 0;
+    font-weight: 500;
+}
+
+/* Enhanced Loading Animation */
 .loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    padding: 4rem 2rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 20px;
+    margin: 2rem 0;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    position: relative;
+    overflow: hidden;
+}
+
+.loading::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    animation: shimmer 2s infinite;
+}
+
+.spinner-container {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 1rem;
-    padding: 2rem;
 }
 
 .spinner {
-    width: 32px;
-    height: 32px;
-    border: 3px solid #e5e7eb;
-    border-top: 3px solid var(--primary-color);
+    width: 60px;
+    height: 60px;
+    position: relative;
+}
+
+.spinner::before,
+.spinner::after {
+    content: '';
+    position: absolute;
     border-radius: 50%;
-    animation: spin 1s linear infinite;
+    animation: spin 1.5s linear infinite;
+}
+
+.spinner::before {
+    width: 100%;
+    height: 100%;
+    border: 3px solid transparent;
+    border-top: 3px solid #ffffff;
+    border-right: 3px solid #ffffff;
+}
+
+.spinner::after {
+    width: 80%;
+    height: 80%;
+    top: 10%;
+    left: 10%;
+    border: 3px solid transparent;
+    border-bottom: 3px solid #ffffff70;
+    border-left: 3px solid #ffffff70;
+    animation: spin 1s linear infinite reverse;
+}
+
+.loading-dots {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.loading-dot {
+    width: 8px;
+    height: 8px;
+    background: #ffffff80;
+    border-radius: 50%;
+    animation: bounce 1.4s infinite ease-in-out;
+}
+
+.loading-dot:nth-child(1) { animation-delay: -0.32s; }
+.loading-dot:nth-child(2) { animation-delay: -0.16s; }
+.loading-dot:nth-child(3) { animation-delay: 0s; }
+
+.loading span {
+    font-size: 1.3rem;
+    color: #ffffff;
+    font-weight: 600;
+    text-align: center;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    animation: textPulse 3s ease-in-out infinite;
+    letter-spacing: 0.5px;
+}
+
+.loading-progress {
+    width: 200px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-top: 1rem;
+}
+
+.loading-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #ffffff, #ffffff80, #ffffff);
+    border-radius: 2px;
+    animation: progress 3s ease-in-out infinite;
+}
+
+.loading-travel-icons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    opacity: 0.8;
+}
+
+.travel-icon {
+    font-size: 1.5rem;
+    animation: float 2s ease-in-out infinite;
+}
+
+.travel-icon:nth-child(1) { animation-delay: 0s; }
+.travel-icon:nth-child(2) { animation-delay: 0.3s; }
+.travel-icon:nth-child(3) { animation-delay: 0.6s; }
+.travel-icon:nth-child(4) { animation-delay: 0.9s; }
+
+@keyframes shimmer {
+    0% { left: -100%; }
+    100% { left: 100%; }
 }
 
 @keyframes spin {
@@ -370,72 +398,49 @@
     100% { transform: rotate(360deg); }
 }
 
-/* Enhanced Loading States */
-.loading-initial,
-.loading-update {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 3rem 2rem;
-    text-align: center;
-    min-height: 300px;
+@keyframes bounce {
+    0%, 80%, 100% { 
+        transform: scale(0.8);
+        opacity: 0.5;
+    }
+    40% { 
+        transform: scale(1.2);
+        opacity: 1;
+    }
 }
 
-.spinner-large {
-    width: 48px;
-    height: 48px;
-    border: 4px solid #e5e7eb;
-    border-top: 4px solid var(--primary-color);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin-bottom: 1.5rem;
+@keyframes textPulse {
+    0%, 100% { 
+        opacity: 1;
+        transform: translateY(0);
+    }
+    50% { 
+        opacity: 0.8;
+        transform: translateY(-2px);
+    }
 }
 
-.loading-text h3 {
-    color: var(--primary-color);
-    margin: 0 0 0.5rem 0;
-    font-size: 1.3rem;
-    font-weight: 600;
+@keyframes progress {
+    0% { 
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% { 
+        transform: translateX(200px);
+        opacity: 0;
+    }
 }
 
-.loading-text p {
-    color: var(--text-muted);
-    margin: 0 0 1.5rem 0;
-    font-size: 1rem;
-    line-height: 1.5;
-}
-
-.loading-steps {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    align-items: center;
-}
-
-.step {
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-    background: #f1f5f9;
-    color: var(--text-muted);
-    font-size: 0.9rem;
-    transition: all 0.3s ease;
-    opacity: 0.5;
-}
-
-.step.active {
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-    color: white;
-    opacity: 1;
-    transform: scale(1.05);
-    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
-}
-
-/* Button Loading State */
-button:disabled {
-    opacity: 0.7;
-    cursor: not-allowed;
-    background: var(--text-muted) !important;
+@keyframes float {
+    0%, 100% { 
+        transform: translateY(0px);
+    }
+    50% { 
+        transform: translateY(-10px);
+    }
 }
 
 /* Location Preview */
@@ -650,11 +655,6 @@ button:disabled {
         <div class="location-map">
             <h5>📍 Location Preview</h5>
             <div id="location-map" style="height: 300px; border-radius: 8px;"></div>
-            <div class="location-tip">
-                <p style="text-align: center; margin-top: 1rem; color: var(--text-muted); font-size: 0.9rem;">
-                    💡 <strong>Tip:</strong> Explore the map and try entering more specific locations (like neighborhoods or districts) for a more detailed and personalized itinerary!
-                </p>
-            </div>
         </div>
     </div>
 
@@ -676,7 +676,7 @@ button:disabled {
                     <button class="action-btn primary" onclick="refineItinerary()">Update Itinerary</button>
                 </div>
                 <div class="management-card">
-                    <h4>📤 Save & Export</h4>
+                    <h4>📤 Export</h4>
                     <div class="action-buttons">
                         <button class="action-btn secondary" onclick="downloadText()">📄 Download</button>
                         <button class="action-btn secondary" onclick="copyItinerary()">📋 Copy</button>
@@ -700,7 +700,6 @@ let map;
 let autocomplete;
 let currentItinerary = '';
 let currentDestination = '';
-let currentLocationInfo = null; // Store location info for updates
 
 // Initialize page when Google Maps API is ready
 function initializePage() {
@@ -820,6 +819,78 @@ function createInteractiveMap(lat, lng, title) {
     });
 }
 
+// Enhanced loading HTML generator with dynamic messaging
+function createEnhancedLoading(initialMessage) {
+    return `
+        <div class="loading">
+            <div class="spinner-container">
+                <div class="spinner"></div>
+            </div>
+            <span id="loading-message">${initialMessage}</span>
+            <div class="loading-dots">
+                <div class="loading-dot"></div>
+                <div class="loading-dot"></div>
+                <div class="loading-dot"></div>
+            </div>
+            <div class="loading-progress">
+                <div class="loading-progress-bar"></div>
+            </div>
+            <div class="loading-travel-icons">
+                <div class="travel-icon">✈️</div>
+                <div class="travel-icon">🗺️</div>
+                <div class="travel-icon">🏨</div>
+                <div class="travel-icon">🎒</div>
+            </div>
+        </div>
+    `;
+}
+
+// Dynamic loading messages
+function startLoadingMessages(isUpdate = false) {
+    const messages = isUpdate ? [
+        'Updating your itinerary...',
+        'Applying your changes...',
+        'Optimizing your travel plan...',
+        'Finalizing your perfect trip...'
+    ] : [
+        'Creating your perfect itinerary...',
+        'Analyzing the best destinations...',
+        'Finding amazing restaurants...',
+        'Calculating optimal routes...',
+        'Adding local insider tips...',
+        'Finalizing your adventure...'
+    ];
+    
+    let messageIndex = 0;
+    const messageElement = document.getElementById('loading-message');
+    
+    if (messageElement) {
+        const interval = setInterval(() => {
+            messageIndex = (messageIndex + 1) % messages.length;
+            if (messageElement) {
+                messageElement.style.opacity = '0';
+                setTimeout(() => {
+                    if (messageElement) {
+                        messageElement.textContent = messages[messageIndex];
+                        messageElement.style.opacity = '1';
+                    }
+                }, 300);
+            }
+        }, 2000);
+        
+        // Store interval for cleanup
+        window.loadingMessageInterval = interval;
+    }
+}
+
+// Stop loading messages
+function stopLoadingMessages() {
+    if (window.loadingMessageInterval) {
+        clearInterval(window.loadingMessageInterval);
+        window.loadingMessageInterval = null;
+    }
+}
+
 // Form submission
 document.getElementById('tripForm').addEventListener('submit', async function(e) {
     e.preventDefault();
@@ -856,8 +927,10 @@ document.getElementById('tripForm').addEventListener('submit', async function(e)
     
     // Show loading
     const generateBtn = document.getElementById('generateBtn');
+    
+    // Disable form and button during generation
     generateBtn.disabled = true;
-    generateBtn.innerHTML = '⏳ Generating...';
+    generateBtn.textContent = 'Generating...';
     
     const resultsSection = document.getElementById('results');
     const itineraryContent = document.getElementById('itineraryContent');
@@ -866,32 +939,10 @@ document.getElementById('tripForm').addEventListener('submit', async function(e)
     document.getElementById('resultTitle').textContent = `Your ${destination} Itinerary`;
     document.getElementById('tripSummary').textContent = `${duration} days • ${people} ${people == 1 ? 'person' : 'people'} • ${budget} budget • ${startDate} to ${endDate}`;
     
-    itineraryContent.innerHTML = `
-        <div class="loading-initial">
-            <div class="spinner-large"></div>
-            <div class="loading-text">
-                <h3>✨ Creating Your Perfect Itinerary</h3>
-                <p>Analyzing your preferences and crafting a personalized travel experience for ${destination}...</p>
-                <div class="loading-steps">
-                    <div class="step active">🌍 Exploring destination</div>
-                    <div class="step">🗺️ Planning activities</div>
-                    <div class="step">🍽️ Finding restaurants</div>
-                    <div class="step">📝 Finalizing details</div>
-                </div>
-            </div>
-        </div>
-    `;
+    itineraryContent.innerHTML = createEnhancedLoading('Creating your perfect itinerary...');
     
-    // Animate loading steps
-    let currentStep = 0;
-    const steps = document.querySelectorAll('.step');
-    const stepInterval = setInterval(() => {
-        if (currentStep < steps.length - 1) {
-            steps[currentStep].classList.remove('active');
-            currentStep++;
-            steps[currentStep].classList.add('active');
-        }
-    }, 2000);
+    // Start dynamic loading messages
+    setTimeout(() => startLoadingMessages(false), 500);
     
     try {
         const response = await fetch(`${CONFIG.BACKEND_URL}/api/generate-itinerary`, {
@@ -914,39 +965,32 @@ document.getElementById('tripForm').addEventListener('submit', async function(e)
         if (response.ok) {
             const data = await response.json();
             if (data.success) {
-                clearInterval(stepInterval);
                 currentDestination = destination;
                 
-                // Fade out loading and show itinerary
-                itineraryContent.style.opacity = '0';
+                // Format itinerary with location information
+                let fullItinerary = formatItinerary(data.itinerary);
+                if (data.location_info) {
+                    fullItinerary = addLocationInfoToItinerary(data.location_info) + fullItinerary;
+                }
+                itineraryContent.innerHTML = fullItinerary;
+                
+                // Show management section
+                document.getElementById('itineraryManagement').style.display = 'block';
+                
+                // Show success message first
+                showMessage('Itinerary generated successfully!', 'success');
+                
+                // Auto-scroll to results section after success notification is visible
                 setTimeout(() => {
-                    // Format itinerary with location information
-                    let fullItinerary = formatItinerary(data.itinerary);
-                    if (data.location_info) {
-                        currentLocationInfo = data.location_info; // Store for future updates
-                        fullItinerary = addLocationInfoToItinerary(data.location_info) + fullItinerary;
+                    const resultsSection = document.getElementById('results');
+                    if (resultsSection) {
+                        resultsSection.scrollIntoView({ 
+                            behavior: 'smooth', 
+                            block: 'start',
+                            inline: 'nearest'
+                        });
                     }
-                    itineraryContent.innerHTML = fullItinerary;
-                    itineraryContent.style.opacity = '1';
-                    
-                    // Show management section
-                    document.getElementById('itineraryManagement').style.display = 'block';
-                    
-                    // Show success message first
-                    showMessage('Itinerary generated successfully! ✨', 'success');
-                    
-                    // Auto-scroll to results section after success notification is visible
-                    setTimeout(() => {
-                        const resultsSection = document.getElementById('results');
-                        if (resultsSection) {
-                            resultsSection.scrollIntoView({ 
-                                behavior: 'smooth', 
-                                block: 'start',
-                                inline: 'nearest'
-                            });
-                        }
-                    }, 800);
-                }, 300);
+                }, 800); // Reduced delay - scroll right after message appears
             } else {
                 throw new Error(data.error || 'Failed to generate itinerary');
             }
@@ -955,13 +999,13 @@ document.getElementById('tripForm').addEventListener('submit', async function(e)
         }
     } catch (error) {
         console.error('Error:', error);
-        clearInterval(stepInterval);
         itineraryContent.innerHTML = '';
         showMessage('Error generating itinerary. Please try again.', 'error');
     } finally {
-        // Always restore button state
+        // Stop loading messages and restore button state
+        stopLoadingMessages();
         generateBtn.disabled = false;
-        generateBtn.innerHTML = '🚀 Generate My Itinerary';
+        generateBtn.textContent = 'Generate My Itinerary';
     }
 });
 
@@ -1010,88 +1054,7 @@ function addLocationInfoToItinerary(data) {
     return locationHTML;
 }
 
-// Helper function to add clickable map links to addresses
-function addMapLinksToContent(content) {
-    return content.replace(/(<div class="location-info">📍 )([^<]+)(<\/div>)/gi, function(match, prefix, address, suffix) {
-        const cleanAddress = address.trim();
-        const mapsUrl = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(cleanAddress);
-        return prefix + '<a href="' + mapsUrl + '" target="_blank" class="map-link">' + cleanAddress + '</a>' + suffix;
-    });
-}
-
-// Clean itinerary formatting function
-function formatItinerary(itinerary) {
-    currentItinerary = itinerary;
-    
-    // Split into lines and process line by line for clean formatting
-    const lines = itinerary.split('\n');
-    let html = '';
-    let inDay = false;
-    let inTimePeriod = false;
-    let inActivity = false;
-    
-    for (let line of lines) {
-        line = line.trim();
-        if (!line) continue;
-        
-        // Remove markdown formatting
-        line = line.replace(/^#+\s*/, '').replace(/\*\*/g, '').replace(/\*/g, '');
-        
-        // Day headers
-        if (line.match(/^Day \d+/i)) {
-            // Close previous sections
-            if (inActivity) { html += '</div></div>'; inActivity = false; }
-            if (inTimePeriod) { html += '</div></div>'; inTimePeriod = false; }
-            if (inDay) { html += '</div></div>'; }
-            
-            html += `<div class="day-section"><h3 class="day-title">📅 ${line}</h3><div class="day-content">`;
-            inDay = true;
-        }
-        // Time periods
-        else if (line.match(/^(Morning|Afternoon|Evening|Night|Breakfast|Lunch|Dinner)/i)) {
-            if (inActivity) { html += '</div></div>'; inActivity = false; }
-            if (inTimePeriod) { html += '</div></div>'; }
-            
-            const icon = line.match(/Breakfast|Lunch|Dinner/i) ? '🍽️' : '🕐';
-            html += `<div class="time-period"><h4 class="time-title">${icon} ${line.replace(':', '')}</h4><div class="activities">`;
-            inTimePeriod = true;
-        }
-        // Activities
-        else if (line.match(/^[-•]\s*(.+?):/)) {
-            if (inActivity) { html += '</div></div>'; }
-            
-            const activityName = line.replace(/^[-•]\s*/, '').replace(':', '');
-            html += `<div class="activity"><h5 class="activity-name">${activityName}</h5><div class="activity-info">`;
-            inActivity = true;
-        }
-        // Information details
-        else if (line.match(/^(Address|Cost|Price|Tip|Transportation):/i)) {
-            const parts = line.split(':');
-            const type = parts[0].toLowerCase().trim();
-            const content = parts.slice(1).join(':').trim();
-            let icon = '📍', className = 'address';
-            
-            if (type.includes('cost') || type.includes('price')) { icon = '💰'; className = 'cost'; }
-            else if (type.includes('tip')) { icon = '💡'; className = 'tip'; }
-            else if (type.includes('transport')) { icon = '🚗'; className = 'transport'; }
-            
-            html += `<p class="${className}">${icon} ${content}</p>`;
-        }
-        // Regular content
-        else if (line.length > 0) {
-            html += `<p class="description">${line}</p>`;
-        }
-    }
-    
-    // Close any remaining open tags
-    if (inActivity) html += '</div></div>';
-    if (inTimePeriod) html += '</div></div>';
-    if (inDay) html += '</div></div>';
-    
-    return `<div class="formatted-itinerary">${addMapLinksToContent(html)}</div>`;
-}
-
-// OLD BROKEN FUNCTION BELOW - WILL BE REMOVED
+// Format itinerary
 function formatItinerary(itinerary) {
     currentItinerary = itinerary;
     
@@ -1102,26 +1065,39 @@ function formatItinerary(itinerary) {
         .replace(/\*\*/g, '') 
         .replace(/\*/g, '') 
         
-        // Format day headers with better styling
-        .replace(/Day (\d+):/g, '<div class="day-header"><h3>📅 Day $1</h3></div>')
+        // Format day headers
+        .replace(/Day (\d+):/g, '<h3>📅 Day $1</h3>')
         
-        // Format time periods with enhanced structure
+        // Format time periods (Morning, Afternoon, Evening)
         .replace(/(Morning|Afternoon|Evening|Lunch|Dinner|Breakfast)\s*\(([^)]+)\):/g, 
-            '<div class="time-block"><div class="time-header"><strong>🕐 $1 ($2)</strong></div><div class="time-content">')
+            '<div class="time-block"><strong>🕐 $1 ($2)</strong>')
         .replace(/(Morning|Afternoon|Evening|Lunch|Dinner|Breakfast):/g, 
-            '<div class="time-block"><div class="time-header"><strong>🕐 $1</strong></div><div class="time-content">')
+            '<div class="time-block"><strong>🕐 $1</strong>')
         
-        // Format activities and attractions with better structure
-        .replace(/^[\s]*-\s*([^:]+):\s*/gm, '<div class="activity-item"><div class="activity-title">$1</div><div class="activity-details">')
+        // Format activities with bullet points
+        .replace(/^[\s]*-\s*([^:]+):\s*/gm, '<div class="activity"><strong>$1:</strong><br>')
         
-        // Format addresses and locations
-        .replace(/Address:\s*([^\n]+)/g, '        .replace(/Transportation:\s*([^\n]+)/gi, '<div class="transport-info">� $1</div>')')
+        // Format addresses with Google Maps links
+        .replace(/Address:\s*([^\n]+)/g, function(match, address) {
+            const cleanAddress = address.trim();
+            const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cleanAddress)}`;
+            return `<div class="location">📍 ${cleanAddress} <a href="${mapsUrl}" target="_blank" class="maps-link">🗺️ View on Maps</a></div>`;
+        })
         
         // Format costs
         .replace(/(?:Estimated cost|Cost)\s*(?:for \d+)?:\s*([^\n]+)/gi, '<div class="cost">💰 $1</div>')
         
         // Format tips
         .replace(/(?:Local Tip|Tip|Cultural Insight):\s*([^\n]+)/gi, '<div class="tip">💡 $1</div>')
+        
+        // Format Safety Information section header
+        .replace(/SAFETY INFORMATION/gi, '<h3 class="safety-header">🛡️ SAFETY INFORMATION</h3>')
+        
+        // Format safety warnings
+        .replace(/(?:Safety Warning|Warning|Caution):\s*([^\n]+)/gi, '<div class="safety-warning">⚠️ $1</div>')
+        
+        // Format emergency contacts
+        .replace(/(?:Emergency|Police|Medical|Tourist Help):\s*([^\n]+)/gi, '<div class="emergency-contact">🚨 $1</div>')
         
         // Format transportation
         .replace(/Transportation:\s*([^\n]+)/gi, '<div class="location">� $1</div>')
@@ -1134,7 +1110,7 @@ function formatItinerary(itinerary) {
         .replace(/\n\n/g, '</p><p>')
         .replace(/\n/g, '<br>');
     
-    return `<div class="formatted-itinerary">${addMapLinksToContent(formatted)}</div>`;
+    return `<div class="formatted-itinerary">${formatted}</div>`;
 }
 
 // Itinerary management functions
@@ -1145,34 +1121,20 @@ async function refineItinerary() {
         return;
     }
 
-    // Get elements
-    const updateBtn = document.querySelector('button[onclick="refineItinerary()"]');
+    // Show loading state - hide current itinerary and show spinner
     const itineraryContent = document.getElementById('itineraryContent');
+    const updateBtn = document.querySelector('button[onclick="refineItinerary()"]');
     
-    // Disable button and show loading state
+    // Hide current itinerary and show loading
+    itineraryContent.innerHTML = createEnhancedLoading('Updating your itinerary...');
+    
+    // Start dynamic loading messages for update
+    setTimeout(() => startLoadingMessages(true), 500);
+    
+    // Disable the update button
     updateBtn.disabled = true;
-    updateBtn.innerHTML = '⏳ Updating...';
+    updateBtn.textContent = 'Updating...';
     
-    // Hide current itinerary with fade effect
-    itineraryContent.style.opacity = '0.3';
-    itineraryContent.style.filter = 'blur(2px)';
-    itineraryContent.style.transition = 'opacity 0.3s ease, filter 0.3s ease';
-    
-    // Show updating message
-    setTimeout(() => {
-        itineraryContent.innerHTML = `
-            <div class="loading-update">
-                <div class="spinner-large"></div>
-                <div class="loading-text">
-                    <h3>🔄 Updating Your Itinerary</h3>
-                    <p>Incorporating your feedback and regenerating your perfect travel plan...</p>
-                </div>
-            </div>
-        `;
-        itineraryContent.style.opacity = '1';
-        itineraryContent.style.filter = 'none';
-    }, 300);
-
     try {
         const response = await fetch(`${CONFIG.BACKEND_URL}/api/refine-itinerary`, {
             method: 'POST',
@@ -1189,37 +1151,23 @@ async function refineItinerary() {
         if (response.ok) {
             const data = await response.json();
             if (data.success) {
-                // Fade out loading, then show updated itinerary
-                itineraryContent.style.opacity = '0';
+                // Update the display
+                document.getElementById('itineraryContent').innerHTML = formatItinerary(data.itinerary);
+                // Update the current itinerary variable for future operations
+                currentItinerary = data.itinerary;
+                document.getElementById('itinerary-changes').value = '';
+                showMessage('Itinerary updated successfully!', 'success');
                 
+                // Auto-scroll to show the updated itinerary
                 setTimeout(() => {
-                    // Update the display with new itinerary, preserving location info
-                    let fullItinerary = formatItinerary(data.itinerary);
-                    if (currentLocationInfo) {
-                        fullItinerary = addLocationInfoToItinerary(currentLocationInfo) + fullItinerary;
+                    const resultsSection = document.getElementById('results');
+                    if (resultsSection) {
+                        resultsSection.scrollIntoView({ 
+                            behavior: 'smooth', 
+                            block: 'start' 
+                        });
                     }
-                    itineraryContent.innerHTML = fullItinerary;
-                    itineraryContent.style.opacity = '1';
-                    
-                    // Ensure management section is still visible
-                    document.getElementById('itineraryManagement').style.display = 'block';
-                    
-                    // Update the current itinerary variable for future operations
-                    currentItinerary = data.itinerary;
-                    document.getElementById('itinerary-changes').value = '';
-                    showMessage('Itinerary updated successfully! ✨', 'success');
-                    
-                    // Auto-scroll to show the updated itinerary
-                    setTimeout(() => {
-                        const resultsSection = document.getElementById('results');
-                        if (resultsSection) {
-                            resultsSection.scrollIntoView({ 
-                                behavior: 'smooth', 
-                                block: 'start' 
-                            });
-                        }
-                    }, 500);
-                }, 300);
+                }, 500);
             } else {
                 throw new Error(data.error || 'Failed to refine itinerary');
             }
@@ -1229,21 +1177,15 @@ async function refineItinerary() {
     } catch (error) {
         console.error('Error refining itinerary:', error);
         showMessage('Error updating itinerary. Please try again.', 'error');
-        
         // Restore original itinerary on error
-        itineraryContent.style.opacity = '0';
-        setTimeout(() => {
-            let fullItinerary = formatItinerary(currentItinerary);
-            if (currentLocationInfo) {
-                fullItinerary = addLocationInfoToItinerary(currentLocationInfo) + fullItinerary;
-            }
-            itineraryContent.innerHTML = fullItinerary;
-            itineraryContent.style.opacity = '1';
-        }, 300);
+        document.getElementById('itineraryContent').innerHTML = formatItinerary(currentItinerary);
     } finally {
         // Always restore button state
         updateBtn.disabled = false;
-        updateBtn.innerHTML = 'Update Itinerary';
+        updateBtn.textContent = 'Update Itinerary';
+        
+        // Stop loading animation if it's active
+        stopLoadingMessages();
     }
 }
 
@@ -1258,78 +1200,69 @@ function getPlainTextItinerary() {
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = currentItinerary;
     
-    // Get the raw text content
+    // Convert HTML to clean plain text
     let plainText = tempDiv.textContent || tempDiv.innerText || '';
     
-    // Enhanced formatting for much better readability
+    // Additional formatting for better readability
     plainText = plainText
-        // Clean up excessive whitespace first
+        // Clean up excessive whitespace
         .replace(/\s+/g, ' ')
-        .trim()
-        
-        // Format day headers with proper spacing and styling
-        .replace(/(Day\s+\d+)/gi, '\n\n' + '='.repeat(50) + '\n📅 $1\n' + '='.repeat(50))
-        
-        // Format time periods with better structure
-        .replace(/(Morning|Afternoon|Evening|Lunch|Dinner|Breakfast)\s*(\([^)]*\))?/gi, '\n\n🕐 $1 $2\n' + '-'.repeat(30))
-        
-        // Format activities and attractions
-        .replace(/([^.\n]+(?:Activity|Visit|Explore|Experience)[^.\n]*)/gi, '\n\n🎯 $1')
-        
-        // Format locations and addresses
-        .replace(/📍\s*([^.\n]+)/gi, '\n   📍 Location: $1')
-        
-        // Format costs and pricing
-        .replace(/💰\s*([^.\n]+)/gi, '\n   💰 Cost: $1')
-        
-        // Format tips and insights
-        .replace(/💡\s*([^.\n]+)/gi, '\n   💡 Tip: $1')
-        
-        // Format transportation
-        .replace(/🚗\s*([^.\n]+)/gi, '\n   🚗 Transportation: $1')
-        
-        // Format restaurants and food
-        .replace(/([^.\n]*(?:restaurant|café|food|dining|eat)[^.\n]*)/gi, '\n\n🍽️ $1')
-        
-        // Add proper line breaks for better readability
-        .replace(/\.\s*/g, '.\n   ')
-        
-        // Clean up multiple newlines but preserve intentional spacing
-        .replace(/\n{4,}/g, '\n\n\n')
-        .replace(/\n{2,}([🕐📅])/g, '\n\n$1')
-        
-        // Clean up trailing whitespace
-        .replace(/[ \t]+$/gm, '')
+        .replace(/\n\s+/g, '\n')
+        // Add proper spacing around day headers
+        .replace(/(Day\s+\d+[:\s]*[^\n]*)/gi, '\n\n📅 $1\n')
+        // Add spacing around time periods
+        .replace(/(Morning|Afternoon|Evening|Night)[:\s]*([^\n]*)/gi, '\n� $1: $2\n')
+        // Format bullet points
+        .replace(/—\s*/g, '\n• ')
+        // Clean up multiple newlines
+        .replace(/\n{3,}/g, '\n\n')
         .trim();
     
-    // Create a nicely formatted header
-    const currentDate = new Date().toLocaleDateString('en-US', { 
-        year: 'numeric', 
-        month: 'long', 
-        day: 'numeric' 
-    });
+    // Add header info if available
+    const headerInfo = `🌍 TRAVEL ITINERARY\n${currentDestination ? `📍 Destination: ${currentDestination}` : ''}\n${currentItinerary.includes('duration') ? '' : ''}\n${'='.repeat(50)}\n\n`;
     
-    const headerInfo = `${'='.repeat(60)}
-🌍 PERSONALIZED TRAVEL ITINERARY
-${'='.repeat(60)}
-
-📍 Destination: ${currentDestination || 'Your Travel Destination'}
-📅 Generated: ${currentDate}
-✨ Created by: go.travel AI Travel Planner
-
-${'-'.repeat(60)}\n\n`;
-    
-    // Create a nice footer
-    const footerInfo = `\n\n${'-'.repeat(60)}
-✨ Thank you for using go.travel!
-🌐 Visit us: https://gotravel-app-407949658262.us-central1.run.app
-📱 Plan your next adventure with AI assistance
-${'='.repeat(60)}`;
-    
-    const finalText = headerInfo + plainText + footerInfo;
+    const finalText = headerInfo + plainText + '\n\n' + '='.repeat(50) + '\n✨ Generated by go.travel - AI Travel Planner\n🌐 https://gotravel-ai-407949658262.us-central1.run.app';
     
     console.log('Converted itinerary preview:', finalText.substring(0, 300) + '...');
     return finalText;
+}
+
+// Enhanced formatting function for export
+function getFormattedItineraryForExport() {
+    if (!currentItinerary) return '';
+    
+    const exportDate = new Date().toLocaleDateString('en-US', { 
+        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
+    });
+    
+    // Better HTML to text conversion that preserves structure
+    let text = currentItinerary
+        .replace(/<h3[^>]*>/gi, '\n\n📅 ')
+        .replace(/<h3 class="safety-header"[^>]*>/gi, '\n\n🛡️ ')
+        .replace(/<\/h3>/gi, '\n' + '─'.repeat(40))
+        .replace(/<div class="time-block"[^>]*><strong[^>]*>/gi, '\n\n🕐 ')
+        .replace(/<\/strong><\/div>/gi, '\n')
+        .replace(/<div class="activity"[^>]*><strong[^>]*>/gi, '\n  • ')
+        .replace(/<\/strong><br><\/div>/gi, '')
+        .replace(/<div class="location"[^>]*>/gi, '\n    📍 ')
+        .replace(/<a href="[^"]*" target="_blank" class="maps-link"[^>]*>🗺️ View on Maps<\/a>/gi, '')
+        .replace(/<div class="cost"[^>]*>/gi, '\n    💰 ')
+        .replace(/<div class="tip"[^>]*>/gi, '\n    💡 ')
+        .replace(/<div class="safety-warning"[^>]*>/gi, '\n    ⚠️ ')
+        .replace(/<div class="emergency-contact"[^>]*>/gi, '\n    🚨 ')
+        .replace(/<\/div>/gi, '')
+        .replace(/<br\s*\/?>/gi, '\n')
+        .replace(/<[^>]+>/g, '')
+        .replace(/\n\s*\n\s*\n/g, '\n\n')
+        .replace(/^\s+|\s+$/gm, '')
+        .replace(/\n{3,}/g, '\n\n')
+        .trim();
+    
+    const destination = currentDestination || 'Your Destination';
+    const header = `🌍 TRAVEL ITINERARY FOR ${destination.toUpperCase()}\n${'═'.repeat(60)}\n📅 Generated: ${exportDate}\n✨ Created by go.travel AI Travel Planner\n${'═'.repeat(60)}\n`;
+    const footer = `\n${'═'.repeat(60)}\n🌐 https://gotravel-app-407949658262.us-central1.run.app\n✨ Powered by Google Gemini 2.5 Flash AI`;
+    
+    return header + '\n' + text + footer;
 }
 
 function downloadText() {
@@ -1340,7 +1273,7 @@ function downloadText() {
     
     console.log('Starting download, currentItinerary:', currentItinerary ? 'exists' : 'missing');
     
-    const plainText = getPlainTextItinerary();
+    const plainText = getFormattedItineraryForExport();
     
     if (!plainText || plainText.trim() === '') {
         showMessage('Unable to export itinerary. Please try generating a new one.', 'error');
@@ -1378,7 +1311,7 @@ function copyItinerary() {
         return;
     }
     
-    const plainText = getPlainTextItinerary();
+    const plainText = getFormattedItineraryForExport();
     
     if (!plainText || plainText.trim() === '') {
         showMessage('Unable to copy itinerary. Please try generating a new one.', 'error');

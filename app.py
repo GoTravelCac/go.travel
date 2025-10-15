@@ -108,13 +108,9 @@ class GoogleAPIService:
                 params = {}
             params['key'] = self.api_key
             
-            response = requests.get(f"{self.base_url}/{endpoint}", params=params, timeout=15)
-            if response.status_code == 200:
-                return response.json()
-            else:
-                print(f"API error: {response.status_code}")
-                return {"error": f"API error: {response.status_code}"}
-                
+            response = requests.get(f"{self.base_url}/{endpoint}", params=params, timeout=10)
+            response.raise_for_status()
+            return response.json()
         except requests.exceptions.RequestException as e:
             print(f"API request error: {e}")
             return {"error": str(e)}
@@ -195,10 +191,6 @@ class WeatherService:
     
     def get_current_weather(self, lat, lng):
         """Get current weather for coordinates"""
-        # If no valid API key, return fallback immediately
-        if not self.api_key or self.api_key == "fallback":
-            return self._get_fallback_weather()
-            
         try:
             params = {
                 'lat': lat,
@@ -206,7 +198,7 @@ class WeatherService:
                 'appid': self.api_key,
                 'units': 'metric'
             }
-            response = requests.get(f"{self.base_url}/weather", params=params, timeout=15)
+            response = requests.get(f"{self.base_url}/weather", params=params, timeout=10)
             if response.status_code == 200:
                 return response.json()
             else:
@@ -308,9 +300,7 @@ class GoogleServicesManager:
                     'restaurants': restaurants
                 }
             }
-            
         except Exception as e:
-            print(f"Error in get_location_info: {e}")
             return {"error": f"Failed to get location info: {str(e)}"}
 
 # Initialize services
@@ -318,16 +308,16 @@ config = Config()
 
 # Initialize Google services with proper error handling
 try:
-    if config.google_api_key:
-        # Initialize with or without OpenWeatherMap API
-        openweather_key = config.openweathermap_api_key or "fallback"  # Use fallback if no key
-        google_services = GoogleServicesManager(config.google_api_key, openweather_key)
+    if config.google_api_key and config.openweathermap_api_key:
+        google_services = GoogleServicesManager(config.google_api_key, config.openweathermap_api_key)
         print("✅ Google services initialized successfully")
-        if not config.openweathermap_api_key:
-            print("⚠️ OpenWeatherMap API key not provided - using fallback weather data")
     else:
         google_services = None
-        print("❌ Missing GOOGLE_API_KEY - Google services not available")
+        print("❌ Missing API keys - Google services not available")
+        if not config.google_api_key:
+            print("   Missing GOOGLE_API_KEY")
+        if not config.openweathermap_api_key:
+            print("   Missing OPENWEATHERMAP_API_KEY")
 except Exception as e:
     google_services = None
     print(f"❌ Failed to initialize Google services: {e}")
@@ -798,11 +788,22 @@ REQUIREMENTS:
 - Include timing recommendations (morning, afternoon, evening)
 - Add transportation tips between locations for {people_text}
 - Consider group size when recommending accommodations and dining reservations
-- Add simple safety tips in locations that are unsafe and known for theft
+
+LOCATION & SAFETY REQUIREMENTS:
+- Provide EXACT FULL ADDRESSES for all attractions, restaurants, and hotels
+- Format addresses as: "Address: [Complete Street Address, City, Postal Code, Country]"
+- Include a dedicated "SAFETY INFORMATION" section at the end covering:
+  * General safety tips for {destination}
+  * Areas to avoid, especially at night
+  * Common scams and how to avoid them
+  * Emergency contact numbers (police, medical, tourist help)
+  * Transportation safety advice
+  * Cultural considerations and local customs
+  * Money and document safety tips
+- Add location-specific safety warnings for attractions in high-risk areas
 - Mention cultural insights and local tips
 - Consider opening hours and seasonal factors
 - Include approximate time needed for each activity
-- Provide coordinates or addresses for major attractions when possible
 - Mention any group rates or family packages available
 
 FORMAT:
@@ -812,8 +813,9 @@ FORMAT:
 - Make it engaging and informative with natural text formatting
 - Include practical details and insider tips
 - Include weather considerations and timezone information when available
+- End with a comprehensive "SAFETY INFORMATION" section
 
-Please create a comprehensive, well-structured itinerary that maximizes the travel experience while being practical and actionable."""
+Please create a comprehensive, well-structured itinerary that maximizes the travel experience while being practical, actionable, and safe."""
 
     return prompt
 
