@@ -102,6 +102,118 @@
     transform: none;
 }
 
+/* Flight Search Styles */
+.flight-search-section {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+}
+
+.form-group {
+    position: relative;
+}
+
+.airport-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-top: none;
+    border-radius: 0 0 var(--border-radius) var(--border-radius);
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1000;
+    display: none;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.airport-suggestion {
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    border-bottom: 1px solid #f3f4f6;
+    transition: background-color 0.2s;
+}
+
+.airport-suggestion:hover {
+    background: #f8fafc;
+}
+
+.airport-suggestion:last-child {
+    border-bottom: none;
+}
+
+.airport-code {
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.airport-name {
+    font-size: 0.9rem;
+    color: var(--text-light);
+    margin-top: 0.25rem;
+}
+
+.flight-results {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e5e7eb;
+    display: none;
+}
+
+.flight-card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: var(--border-radius);
+    padding: 1rem;
+    margin: 0.5rem 0;
+    transition: box-shadow 0.2s;
+}
+
+.flight-card:hover {
+    box-shadow: var(--shadow-md);
+}
+
+.flight-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.flight-number {
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.flight-price {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: #059669;
+}
+
+.flight-details {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 1rem;
+    align-items: center;
+}
+
+.flight-time {
+    text-align: center;
+}
+
+.flight-duration {
+    color: var(--text-light);
+    font-size: 0.9rem;
+    padding: 0.25rem 0.75rem;
+    background: #f3f4f6;
+    border-radius: 20px;
+}
+
 /* Results Section */
 .results-section {
     background: var(--white);
@@ -665,6 +777,27 @@
                     <option value="mix">🔄 Mix of Options</option>
                 </select>
             </div>
+        </div>
+
+        <!-- Flight Search Section -->
+        <div class="flight-search-section" id="flightSearchSection" style="display: none;">
+            <h4 style="color: var(--primary-color); margin-bottom: 1rem;">✈️ Flight Search (Optional)</h4>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="originAirport">🛫 Departure Airport</label>
+                    <input type="text" id="originAirport" placeholder="Search for departure airport..." autocomplete="off">
+                    <div id="originSuggestions" class="airport-suggestions"></div>
+                </div>
+                <div class="form-group">
+                    <label for="destinationAirport">🛬 Arrival Airport</label>
+                    <input type="text" id="destinationAirport" placeholder="Search for arrival airport..." autocomplete="off">
+                    <div id="destinationSuggestions" class="airport-suggestions"></div>
+                </div>
+            </div>
+            <button type="button" class="action-btn secondary" onclick="searchFlights()" id="flightSearchBtn">
+                🔍 Search Flights
+            </button>
+            <div id="flightResults" class="flight-results"></div>
         </div>
 
         <div class="form-group">
@@ -1460,6 +1593,182 @@ function showMessage(message, type) {
 // Initialize page when Google Maps API is loaded
 window.initializePage = initializePage;
 
+// Flight Search Functions
+let airportSearchTimeout;
+
+async function searchAirports(query, targetElement) {
+    if (!query || query.length < 2) {
+        document.getElementById(targetElement).style.display = 'none';
+        return;
+    }
+    
+    clearTimeout(airportSearchTimeout);
+    airportSearchTimeout = setTimeout(async () => {
+        try {
+            const response = await fetch('/api/flights/search-airports', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ query: query })
+            });
+            
+            const data = await response.json();
+            displayAirportSuggestions(data.airports || [], targetElement);
+            
+        } catch (error) {
+            console.error('Error searching airports:', error);
+        }
+    }, 300);
+}
+
+function displayAirportSuggestions(airports, targetElement) {
+    const suggestionsDiv = document.getElementById(targetElement);
+    
+    if (!airports || airports.length === 0) {
+        suggestionsDiv.style.display = 'none';
+        return;
+    }
+    
+    suggestionsDiv.innerHTML = airports.map(airport => `
+        <div class="airport-suggestion" onclick="selectAirport('${airport.code}', '${airport.name}', '${targetElement}')">
+            <div class="airport-code">${airport.code}</div>
+            <div class="airport-name">${airport.name}, ${airport.city}</div>
+        </div>
+    `).join('');
+    
+    suggestionsDiv.style.display = 'block';
+}
+
+function selectAirport(code, name, targetElement) {
+    const inputId = targetElement.replace('Suggestions', '');
+    const input = document.getElementById(inputId);
+    input.value = `${code} - ${name}`;
+    input.setAttribute('data-airport-code', code);
+    document.getElementById(targetElement).style.display = 'none';
+}
+
+async function searchFlights() {
+    const originInput = document.getElementById('originAirport');
+    const destinationInput = document.getElementById('destinationAirport');
+    const startDate = document.getElementById('startDate').value;
+    const people = parseInt(document.getElementById('people').value) || 1;
+    const children = parseInt(document.getElementById('children').value) || 0;
+    
+    const originCode = originInput.getAttribute('data-airport-code');
+    const destinationCode = destinationInput.getAttribute('data-airport-code');
+    
+    if (!originCode || !destinationCode || !startDate) {
+        showMessage('Please select valid departure and arrival airports, and a travel date.', 'error');
+        return;
+    }
+    
+    const flightBtn = document.getElementById('flightSearchBtn');
+    flightBtn.disabled = true;
+    flightBtn.textContent = '🔍 Searching Flights...';
+    
+    try {
+        const response = await fetch('/api/flights/search', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                origin: originCode,
+                destination: destinationCode,
+                departure_date: startDate,
+                adults: people - children,
+                children: children
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success && data.flights) {
+            displayFlightResults(data.flights);
+        } else {
+            showMessage(data.error || 'No flights found', 'error');
+        }
+        
+    } catch (error) {
+        console.error('Flight search error:', error);
+        showMessage('Error searching flights. Please try again.', 'error');
+    } finally {
+        flightBtn.disabled = false;
+        flightBtn.textContent = '🔍 Search Flights';
+    }
+}
+
+function displayFlightResults(flights) {
+    const resultsDiv = document.getElementById('flightResults');
+    
+    if (!flights || flights.length === 0) {
+        resultsDiv.innerHTML = '<p>No flights found for your search criteria.</p>';
+        resultsDiv.style.display = 'block';
+        return;
+    }
+    
+    resultsDiv.innerHTML = `
+        <h5>✈️ Available Flights (${flights.length} results)</h5>
+        ${flights.map(flight => `
+            <div class="flight-card">
+                <div class="flight-header">
+                    <span class="flight-number">${flight.flight_number}</span>
+                    <span class="flight-price">${flight.price}</span>
+                </div>
+                <div class="flight-details">
+                    <div>
+                        <strong>${flight.departure_airport}</strong><br>
+                        ${formatFlightTime(flight.departure_time)}
+                    </div>
+                    <div class="flight-duration">${formatDuration(flight.duration)}</div>
+                    <div>
+                        <strong>${flight.arrival_airport}</strong><br>
+                        ${formatFlightTime(flight.arrival_time)}
+                    </div>
+                </div>
+            </div>
+        `).join('')}
+    `;
+    resultsDiv.style.display = 'block';
+}
+
+function formatFlightTime(timeString) {
+    try {
+        const date = new Date(timeString);
+        return date.toLocaleString('en-US', {
+            hour: '2-digit',
+            minute: '2-digit',
+            month: 'short',
+            day: 'numeric'
+        });
+    } catch (e) {
+        return timeString;
+    }
+}
+
+function formatDuration(duration) {
+    // Convert ISO 8601 duration (PT2H30M) to readable format
+    const match = duration.match(/PT(\d+H)?(\d+M)?/);
+    if (!match) return duration;
+    
+    const hours = match[1] ? match[1].replace('H', 'h ') : '';
+    const minutes = match[2] ? match[2].replace('M', 'm') : '';
+    return (hours + minutes).trim() || duration;
+}
+
+// Show flight search when travel transport is set to plane
+function checkTravelTransport() {
+    const travelTransport = document.getElementById('travelTransport').value;
+    const flightSection = document.getElementById('flightSearchSection');
+    
+    if (travelTransport === 'plane') {
+        flightSection.style.display = 'block';
+    } else {
+        flightSection.style.display = 'none';
+    }
+}
+
 // Validation for children not exceeding total people
 function setupChildrenValidation() {
     const peopleInput = document.getElementById('people');
@@ -1489,6 +1798,36 @@ function setupChildrenValidation() {
 document.addEventListener('DOMContentLoaded', function() {
     // Setup children validation
     setupChildrenValidation();
+    
+    // Setup flight search functionality
+    const originInput = document.getElementById('originAirport');
+    const destinationInput = document.getElementById('destinationAirport');
+    const travelTransportSelect = document.getElementById('travelTransport');
+    
+    if (originInput) {
+        originInput.addEventListener('input', (e) => {
+            searchAirports(e.target.value, 'originSuggestions');
+        });
+    }
+    
+    if (destinationInput) {
+        destinationInput.addEventListener('input', (e) => {
+            searchAirports(e.target.value, 'destinationSuggestions');
+        });
+    }
+    
+    if (travelTransportSelect) {
+        travelTransportSelect.addEventListener('change', checkTravelTransport);
+    }
+    
+    // Hide suggestions when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.form-group')) {
+            document.querySelectorAll('.airport-suggestions').forEach(div => {
+                div.style.display = 'none';
+            });
+        }
+    });
     
     // Add a small delay to allow Google Maps to load first
     setTimeout(function() {

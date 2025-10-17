@@ -12,6 +12,7 @@ from flask import Flask, request, jsonify, render_template, send_from_directory
 from flask_cors import CORS
 import google.generativeai as genai
 from dotenv import load_dotenv
+from flight_service import FlightAPIService, AviationstackService
 
 # Load environment variables
 load_dotenv()
@@ -26,13 +27,18 @@ class Config:
         self.gemini_api_key = os.getenv('GEMINI_API_KEY')
         self.google_api_key = os.getenv('GOOGLE_API_KEY')
         self.openweathermap_api_key = os.getenv('OPENWEATHERMAP_API_KEY')
+        self.amadeus_api_key = os.getenv('AMADEUS_API_KEY')
+        self.amadeus_api_secret = os.getenv('AMADEUS_API_SECRET')
+        self.aviationstack_api_key = os.getenv('AVIATIONSTACK_API_KEY')
         self.gemini_model = None
+        self.flight_service = None
         self.setup_apis()
     
     def setup_apis(self):
         """Initialize all API services"""
         self.setup_gemini()
         self.validate_google_apis()
+        self.setup_flight_services()
     
     def setup_gemini(self):
         """Initialize Gemini AI model"""
@@ -73,11 +79,27 @@ class Config:
         except Exception as e:
             print(f"⚠️ Could not validate Google APIs: {e}")
     
+    def setup_flight_services(self):
+        """Initialize flight API services"""
+        if self.amadeus_api_key and self.amadeus_api_secret:
+            try:
+                self.flight_service = FlightAPIService(
+                    self.amadeus_api_key, 
+                    self.amadeus_api_secret
+                )
+                print("✅ Amadeus Flight API service initialized")
+            except Exception as e:
+                print(f"❌ Amadeus Flight API error: {e}")
+                self.flight_service = None
+        else:
+            print("⚠️ AMADEUS_API_KEY or AMADEUS_API_SECRET not found - flight features disabled")
+    
     def get_api_status(self):
         """Get status of all configured APIs"""
         return {
             'gemini_available': self.gemini_model is not None,
             'google_api_available': self.google_api_key is not None,
+            'flight_api_available': self.flight_service is not None,
             'supported_apis': [
                 'Weather API',
                 'Time Zone API', 
@@ -89,7 +111,10 @@ class Config:
                 'Maps JavaScript API',
                 'Geocoding API',
                 'Geolocation API',
-                'Directions API'
+                'Directions API',
+                'Amadeus Flight Search API',
+                'Airport Information API',
+                'Airline Data API'
             ]
         }
 
@@ -922,6 +947,125 @@ Please update the itinerary based on the user's feedback. Keep the same format a
             'success': False,
             'error': f'Failed to refine itinerary: {str(e)}'
         }), 500
+
+# Flight API Endpoints
+@app.route('/api/flights/search-airports', methods=['POST'])
+def search_airports():
+    """Search for airports by city or airport name"""
+    try:
+        if not config.flight_service:
+            return jsonify({
+                'success': False,
+                'error': 'Flight service not available. Please configure Amadeus API keys.'
+            }), 503
+            
+        data = request.get_json()
+        query = data.get('query', '')
+        
+        if not query:
+            return jsonify({
+                'success': False,
+                'error': 'Query parameter is required'
+            }), 400
+        
+        airports = config.flight_service.search_airports(query)
+        
+        return jsonify({
+            'success': True,
+            'airports': airports,
+            'total': len(airports)
+        })
+        
+    except Exception as e:
+        print(f"❌ Error searching airports: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/flights/search', methods=['POST'])
+def search_flights():
+    """Search for flights between origin and destination"""
+    try:
+        if not config.flight_service:
+            return jsonify({
+                'success': False,
+                'error': 'Flight service not available. Please configure Amadeus API keys.'
+            }), 503
+            
+        data = request.get_json()
+        
+        # Validate required fields
+        required_fields = ['origin', 'destination', 'departure_date']
+        missing_fields = [field for field in required_fields if not data.get(field)]
+        
+        if missing_fields:
+            return jsonify({
+                'success': False,
+                'error': f'Missing required fields: {", ".join(missing_fields)}'
+            }), 400
+        
+        # Extract flight search parameters
+        origin = data.get('origin')
+        destination = data.get('destination')
+        departure_date = data.get('departure_date')
+        return_date = data.get('return_date')
+        adults = data.get('adults', 1)
+        children = data.get('children', 0)
+        
+        # Search flights
+        flight_results = config.flight_service.search_flights(
+            origin=origin,
+            destination=destination,
+            departure_date=departure_date,
+            return_date=return_date,
+            adults=adults,
+            children=children
+        )
+        
+        return jsonify({
+            'success': True,
+            'flights': flight_results['flights'],
+            'search_params': flight_results['search_params'],
+            'total_results': flight_results.get('total_results', 0)
+        })
+        
+    except Exception as e:
+        print(f"❌ Error searching flights: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/flights/inspiration', methods=['POST'])
+def flight_inspiration():
+    """Get flight inspiration - popular destinations from origin"""
+    try:
+        if not config.flight_service:
+            return jsonify({
+                'success': False,
+                'error': 'Flight service not available'
+            }), 503
+            
+        data = request.get_json()
+        origin = data.get('origin')
+        max_price = data.get('max_price')
+        
+        if not origin:
+            return jsonify({
+                'success': False,
+                'error': 'Origin airport code is required'
+            }), 400
+        
+        destinations = config.flight_service.get_flight_inspiration(
+            origin=origin,
+            max_price=max_price
+        )
+        
+        return jsonify({
+            'success': True,
+            'destinations': destinations,
+            'origin': origin,
+            'total': len(destinations)
+        })
+        
+    except Exception as e:
+        print(f"❌ Error getting flight inspiration: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.errorhandler(404)
 def not_found(error):
