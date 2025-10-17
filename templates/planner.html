@@ -1256,6 +1256,10 @@ function addLocationInfoToItinerary(data) {
 function formatItinerary(itinerary) {
     currentItinerary = itinerary;
     
+    // Debug: Check for separator patterns
+    const separatorMatches = itinerary.match(/^\s*--\s*$/gm);
+    console.log('Found separator patterns:', separatorMatches);
+    
     // Enhanced formatting with better structure
     let formatted = itinerary
         // Remove markdown characters
@@ -1263,8 +1267,8 @@ function formatItinerary(itinerary) {
         .replace(/\*\*/g, '') 
         .replace(/\*/g, '') 
         
-        // Format section separators
-        .replace(/^--\s*$/gm, '<div class="section-separator"></div>')
+        // Format section separators ONLY for exact "--" pattern (must be standalone on line)
+        .replace(/^\s*--\s*$/gm, '<div class="section-separator"></div>')
         
         // Format day headers
         .replace(/Day (\d+):/g, '<h3>📅 Day $1</h3>')

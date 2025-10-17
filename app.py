@@ -882,8 +882,9 @@ LOCATION & SAFETY REQUIREMENTS:
 FORMAT:
 - Use clear headings for each day
 - Organize activities by time of day
-- Use "--" as a separator between major sections (between days, before safety info, etc.)
-- Do not include any *, **, or # characters, use indents, hyphens, and em dashes for clearer formatting
+- ONLY use "--" on its own line to separate major sections (example: after all days are complete and before "SAFETY INFORMATION")
+- Do NOT use "--" within daily activities or descriptions
+- Do not include any *, **, or # characters, use indents, hyphens, and em dashes for clearer formatting  
 - Make it engaging and informative with natural text formatting
 - Include practical details and insider tips
 - Include weather considerations and timezone information when available
