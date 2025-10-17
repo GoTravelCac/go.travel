@@ -199,6 +199,25 @@
     overflow-x: auto;
 }
 
+.section-separator {
+    border-top: 2px solid #e5e7eb;
+    margin: 2rem 0;
+    height: 1px;
+    position: relative;
+}
+
+.section-separator::after {
+    content: '✨';
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    padding: 0 1rem;
+    color: var(--primary-color);
+    font-size: 1.2rem;
+}
+
 .itinerary-content p {
     margin: 0.75rem 0;
     line-height: 1.7;
@@ -588,9 +607,16 @@
 
         <div class="form-row">
             <div class="form-group">
-                <label for="people">� Number of People</label>
+                <label for="people">👥 Number of People</label>
                 <input type="number" id="people" name="people" min="1" max="20" value="1" required>
             </div>
+            <div class="form-group">
+                <label for="children">👶 Number of Children</label>
+                <input type="number" id="children" name="children" min="0" max="0" value="0">
+            </div>
+        </div>
+
+        <div class="form-row">
             <div class="form-group">
                 <label for="budget">💰 Budget Level</label>
                 <select id="budget" name="budget" required>
@@ -598,6 +624,45 @@
                     <option value="budget">💵 Budget-friendly</option>
                     <option value="moderate">💸 Moderate</option>
                     <option value="luxury">💎 Luxury</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="lodging">🏨 Lodging Type</label>
+                <select id="lodging" name="lodging" required>
+                    <option value="">Select lodging type</option>
+                    <option value="hotel">🏨 Hotel</option>
+                    <option value="airbnb">🏠 Airbnb/Vacation Rental</option>
+                    <option value="resort">🏖️ Resort</option>
+                    <option value="hostel">🛏️ Hostel</option>
+                    <option value="already_booked">✅ Already Booked</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="travelTransport">✈️ Travel Transportation</label>
+                <select id="travelTransport" name="travelTransport" required>
+                    <option value="">How are you getting there?</option>
+                    <option value="plane">✈️ Airplane</option>
+                    <option value="drive">🚗 Driving</option>
+                    <option value="train">🚂 Train</option>
+                    <option value="bus">🚌 Bus</option>
+                    <option value="cruise">🚢 Cruise</option>
+                    <option value="other">🚀 Other</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="localTransport">🚗 Local Transportation</label>
+                <select id="localTransport" name="localTransport" required>
+                    <option value="">Local transportation preference</option>
+                    <option value="rental_car">🚗 Rental Car</option>
+                    <option value="own_car">🚙 Own Car</option>
+                    <option value="rideshare">🚕 Rideshare/Taxi</option>
+                    <option value="public_transport">🚇 Public Transportation</option>
+                    <option value="walking">🚶 Walking</option>
+                    <option value="bike">🚲 Bike/Scooter</option>
+                    <option value="mix">🔄 Mix of Options</option>
                 </select>
             </div>
         </div>
@@ -1065,6 +1130,9 @@ function formatItinerary(itinerary) {
         .replace(/\*\*/g, '') 
         .replace(/\*/g, '') 
         
+        // Format section separators
+        .replace(/^--\s*$/gm, '<div class="section-separator"></div>')
+        
         // Format day headers
         .replace(/Day (\d+):/g, '<h3>📅 Day $1</h3>')
         
@@ -1208,14 +1276,26 @@ function getPlainTextItinerary() {
         // Clean up excessive whitespace
         .replace(/\s+/g, ' ')
         .replace(/\n\s+/g, '\n')
+        // Handle section separators
+        .replace(/--/g, '\n' + '─'.repeat(50) + '\n')
         // Add proper spacing around day headers
         .replace(/(Day\s+\d+[:\s]*[^\n]*)/gi, '\n\n📅 $1\n')
         // Add spacing around time periods
-        .replace(/(Morning|Afternoon|Evening|Night)[:\s]*([^\n]*)/gi, '\n� $1: $2\n')
+        .replace(/(Morning|Afternoon|Evening|Night)[:\s]*([^\n]*)/gi, '\n🕐 $1: $2\n')
+        // Format safety information header
+        .replace(/(SAFETY INFORMATION)/gi, '\n\n🛡️ $1\n' + '─'.repeat(30) + '\n')
         // Format bullet points
         .replace(/—\s*/g, '\n• ')
+        .replace(/•\s*/g, '\n  • ')
+        // Add spacing before addresses
+        .replace(/(📍[^\n]+)/g, '\n    $1')
+        // Add spacing before costs
+        .replace(/(💰[^\n]+)/g, '\n    $1')
+        // Add spacing before tips
+        .replace(/(💡[^\n]+)/g, '\n    $1')
         // Clean up multiple newlines
-        .replace(/\n{3,}/g, '\n\n')
+        .replace(/\n{4,}/g, '\n\n\n')
+        .replace(/\n{3}/g, '\n\n')
         .trim();
     
     // Add header info if available
@@ -1380,8 +1460,36 @@ function showMessage(message, type) {
 // Initialize page when Google Maps API is loaded
 window.initializePage = initializePage;
 
+// Validation for children not exceeding total people
+function setupChildrenValidation() {
+    const peopleInput = document.getElementById('people');
+    const childrenInput = document.getElementById('children');
+    
+    function validateChildren() {
+        const totalPeople = parseInt(peopleInput.value) || 0;
+        const children = parseInt(childrenInput.value) || 0;
+        
+        // Update max attribute for children input
+        childrenInput.max = totalPeople;
+        
+        // If children exceeds total people, set to max allowed
+        if (children > totalPeople) {
+            childrenInput.value = totalPeople;
+        }
+    }
+    
+    peopleInput.addEventListener('input', validateChildren);
+    childrenInput.addEventListener('input', validateChildren);
+    
+    // Initial validation
+    validateChildren();
+}
+
 // Fallback initialization for duration calculation if Google Maps fails
 document.addEventListener('DOMContentLoaded', function() {
+    // Setup children validation
+    setupChildrenValidation();
+    
     // Add a small delay to allow Google Maps to load first
     setTimeout(function() {
         // If Google Maps hasn't initialized the date calculation, do it manually

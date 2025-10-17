@@ -664,14 +664,18 @@ def generate_itinerary():
         end_date = data.get('end_date')
         duration = data.get('duration')
         people = data.get('people')
+        children = data.get('children', 0)
         budget = data.get('budget', '')
+        lodging = data.get('lodging', '')
+        travel_transport = data.get('travelTransport', '')
+        local_transport = data.get('localTransport', '')
         interests = data.get('interests', [])
         special_requests = data.get('special_requests', '')
         
         # Create enhanced prompt with Google API integration
         prompt = create_enhanced_itinerary_prompt(
-            destination, start_date, end_date, duration, people,
-            budget, interests, special_requests
+            destination, start_date, end_date, duration, people, children,
+            budget, lodging, travel_transport, local_transport, interests, special_requests
         )
         
         print(f"🎯 Generating enhanced itinerary for {destination} ({duration} days)")
@@ -744,16 +748,22 @@ def clean_itinerary_text(text):
     
     return cleaned_text.strip()
 
-def create_enhanced_itinerary_prompt(destination, start_date, end_date, duration, people, budget, interests, special_requests):
+def create_enhanced_itinerary_prompt(destination, start_date, end_date, duration, people, children, budget, lodging, travel_transport, local_transport, interests, special_requests):
     """Create an enhanced prompt with Google API integration"""
     
     # Convert interests list to readable format
     interests_text = ', '.join(interests) if interests else 'general sightseeing'
     
-    # People context
+    # People and children context
     people_text = f"{people} {'person' if people == 1 else 'people'}"
+    if children > 0:
+        people_text += f" (including {children} {'child' if children == 1 else 'children'})"
+    
     group_context = ""
-    if people == 1:
+    if children > 0:
+        group_context = f"\n- Plan family-friendly activities suitable for children"
+        group_context += f"\n- Consider child safety, accessibility, and age-appropriate attractions"
+    elif people == 1:
         group_context = "\n- Plan activities suitable for solo travelers"
     elif people == 2:
         group_context = "\n- Plan romantic and couple-friendly activities"
@@ -767,10 +777,48 @@ def create_enhanced_itinerary_prompt(destination, start_date, end_date, duration
     if budget:
         if budget == 'budget':
             budget_context = "\n- Focus on budget-friendly options, free attractions, and affordable accommodations"
-        elif budget == 'mid-range':
+        elif budget == 'moderate':
             budget_context = "\n- Include mid-range accommodations and dining options"
         elif budget == 'luxury':
             budget_context = "\n- Include luxury accommodations, fine dining, and premium experiences"
+    
+    # Lodging context
+    lodging_context = ""
+    if lodging:
+        if lodging == 'hotel':
+            lodging_context = "\n- Recommend hotels with appropriate amenities for the group size"
+        elif lodging == 'airbnb':
+            lodging_context = "\n- Suggest Airbnb or vacation rental properties suitable for the group"
+        elif lodging == 'resort':
+            lodging_context = "\n- Focus on resort accommodations with inclusive amenities"
+        elif lodging == 'hostel':
+            lodging_context = "\n- Recommend hostels with private rooms or dorms as appropriate"
+        elif lodging == 'already_booked':
+            lodging_context = "\n- Accommodation is already booked, focus on activities and dining"
+    
+    # Transportation context
+    transport_context = ""
+    if travel_transport:
+        transport_context += f"\n- Travel method: {travel_transport}"
+        if travel_transport == 'plane':
+            transport_context += " (include airport transfer recommendations)"
+        elif travel_transport == 'drive':
+            transport_context += " (include parking information and scenic route suggestions)"
+        elif travel_transport == 'train':
+            transport_context += " (include train station information and connections)"
+        elif travel_transport == 'cruise':
+            transport_context += " (include port information and shore excursions)"
+    
+    if local_transport:
+        transport_context += f"\n- Local transportation: {local_transport}"
+        if local_transport == 'rental_car':
+            transport_context += " (include rental locations, parking, and driving tips)"
+        elif local_transport == 'public_transport':
+            transport_context += " (include transit passes, routes, and schedules)"
+        elif local_transport == 'walking':
+            transport_context += " (focus on walkable attractions and neighborhoods)"
+        elif local_transport == 'rideshare':
+            transport_context += " (include ride-hailing apps and taxi information)"
     
     # Special requests context
     special_context = f"\n- Special considerations: {special_requests}" if special_requests else ""
@@ -779,7 +827,7 @@ def create_enhanced_itinerary_prompt(destination, start_date, end_date, duration
 
 TRAVELER PREFERENCES:
 - Group size: {people_text}
-- Interests: {interests_text}{budget_context}{group_context}{special_context}
+- Interests: {interests_text}{budget_context}{lodging_context}{transport_context}{group_context}{special_context}
 
 REQUIREMENTS:
 - Provide a day-by-day breakdown (Day 1, Day 2, etc.)
@@ -809,11 +857,13 @@ LOCATION & SAFETY REQUIREMENTS:
 FORMAT:
 - Use clear headings for each day
 - Organize activities by time of day
+- Use "--" as a separator between major sections (between days, before safety info, etc.)
 - Do not include any *, **, or # characters, use indents, hyphens, and em dashes for clearer formatting
 - Make it engaging and informative with natural text formatting
 - Include practical details and insider tips
 - Include weather considerations and timezone information when available
 - End with a comprehensive "SAFETY INFORMATION" section
+- Add proper spacing between sections for better readability
 
 Please create a comprehensive, well-structured itinerary that maximizes the travel experience while being practical, actionable, and safe."""
 
@@ -821,7 +871,8 @@ Please create a comprehensive, well-structured itinerary that maximizes the trav
 
 def create_itinerary_prompt(destination, start_date, end_date, duration, people, budget, interests, special_requests):
     """Create a detailed prompt for Gemini AI (legacy function)"""
-    return create_enhanced_itinerary_prompt(destination, start_date, end_date, duration, people, budget, interests, special_requests)
+    # Use default values for new parameters to maintain backward compatibility
+    return create_enhanced_itinerary_prompt(destination, start_date, end_date, duration, people, 0, budget, '', '', '', interests, special_requests)
 
 @app.route('/api/refine-itinerary', methods=['POST'])
 def refine_itinerary():
