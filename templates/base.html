@@ -39,7 +39,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- Google Maps API -->
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ google_api_key }}&libraries=places,marker&loading=async&callback=initializePage"></script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ google_api_key }}&libraries=places&loading=async&callback=initializePage"></script>
     
     <!-- Fallback for pages that don't have initializePage -->
     <script>
@@ -49,6 +49,18 @@
                 console.log('Google Maps API loaded (fallback)');
             };
         }
+        
+        // Handle Google Maps loading errors
+        window.gm_authFailure = function() {
+            console.error('Google Maps authentication failed - check API key and domain restrictions');
+            // Hide any maps containers to prevent error dialogs
+            const mapContainers = document.querySelectorAll('.location-map, [id*="map"]');
+            mapContainers.forEach(container => {
+                if (container) {
+                    container.style.display = 'none';
+                }
+            });
+        };
     </script>
     
     <style>

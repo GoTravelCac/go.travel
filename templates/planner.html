@@ -201,203 +201,61 @@
     overflow-x: auto;
 }
 
-/* Enhanced Itinerary Styling */
-.formatted-itinerary {
+/* Simple Itinerary Styling */
+.simple-itinerary {
     max-width: 100%;
     overflow-x: auto;
+    line-height: 1.8;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    color: var(--text-color);
+}
+
+/* Simple Divider Lines */
+.divider-line {
+    border: none;
+    border-top: 2px solid var(--primary-color);
+    margin: 2rem 0 1rem 0;
+    width: 100%;
+}
+
+/* Simple Headers */
+.simple-itinerary h3 {
+    color: var(--primary-color);
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin: 1rem 0 0.5rem 0;
+}
+
+.simple-itinerary h4 {
+    color: var(--secondary-color);
+    font-size: 1.2rem;
+    font-weight: 500;
+    margin: 0.75rem 0 0.5rem 0;
+}
+
+/* Simple Paragraphs */
+.simple-itinerary p {
+    margin: 0.5rem 0;
     line-height: 1.6;
 }
 
-/* Section Dividers */
-.section-divider {
-    margin: 2rem 0;
-    border-top: 2px solid #e5e7eb;
-    position: relative;
-}
-
-.section-divider::after {
-    content: '✨';
-    position: absolute;
-    top: -12px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: white;
-    padding: 0 1rem;
+/* Simple Strong Text */
+.simple-itinerary strong {
     color: var(--primary-color);
-    font-size: 1.2rem;
-}
-
-/* Day Headers */
-.day-header {
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-    color: white;
-    padding: 1rem 1.5rem;
-    border-radius: 12px;
-    margin: 1rem 0;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
-
-.day-header h3 {
-    margin: 0;
-    font-size: 1.3rem;
     font-weight: 600;
 }
 
-/* Time Sections */
-.time-section {
-    margin: 1.5rem 0;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    overflow: hidden;
-    background: white;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-}
-
-.time-header {
-    background: #f8fafc;
-    padding: 0.75rem 1rem;
-    font-weight: 600;
-    color: var(--text-color);
-    border-bottom: 1px solid #e5e7eb;
-}
-
-.time-content {
-    padding: 1rem;
-}
-
-/* Activity Items */
-.activity-item {
-    margin: 1rem 0;
-    border-left: 3px solid var(--secondary-color);
-    background: #fafbff;
-    border-radius: 0 8px 8px 0;
-    overflow: hidden;
-}
-
-.activity-title {
-    background: rgba(236, 72, 153, 0.1);
-    padding: 0.5rem 1rem;
-    font-weight: 600;
-    color: var(--text-color);
-}
-
-.activity-details {
-    padding: 0.75rem 1rem;
-}
-
-/* Location and Maps */
-.location-box {
-    background: linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 100%);
-    border: 1px solid #d1fae5;
-    border-radius: 8px;
-    padding: 1rem;
-    margin: 0.75rem 0;
-}
-
-.location-address {
-    font-weight: 500;
-    color: #065f46;
-    margin-bottom: 0.5rem;
-}
-
-.maps-actions {
-    display: flex;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-}
-
-.maps-btn, .directions-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.25rem;
-    padding: 0.375rem 0.75rem;
-    background: #10b981;
-    color: white;
+/* Simple Links */
+.simple-itinerary a {
+    color: #3b82f6;
     text-decoration: none;
-    border-radius: 6px;
-    font-size: 0.875rem;
-    font-weight: 500;
-    transition: background-color 0.2s;
-}
-
-.maps-btn:hover, .directions-btn:hover {
-    background: #059669;
-    color: white;
-}
-
-.directions-btn {
-    background: #3b82f6;
-}
-
-.directions-btn:hover {
-    background: #2563eb;
-}
-
-/* Cost Boxes */
-.cost-box {
-    background: linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 100%);
-    border: 1px solid #a7f3d0;
-    border-radius: 8px;
-    padding: 0.75rem 1rem;
-    margin: 0.5rem 0;
-    color: #065f46;
     font-weight: 500;
 }
 
-/* Tip Boxes */
-.tip-box {
-    background: linear-gradient(135deg, #fef3c7 0%, #fef7cd 100%);
-    border: 1px solid #fbbf24;
-    border-radius: 8px;
-    padding: 0.75rem 1rem;
-    margin: 0.5rem 0;
-    color: #92400e;
-    border-left: 4px solid #f59e0b;
+.simple-itinerary a:hover {
+    color: #2563eb;
+    text-decoration: underline;
 }
-
-/* Section Headers */
-.safety-section, .culture-section, .money-section, .emergency-section {
-    background: white;
-    border-radius: 12px;
-    padding: 1.5rem;
-    margin: 1rem 0;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
-
-.safety-title {
-    color: #dc2626;
-    margin: 0 0 1rem 0;
-    padding: 0.75rem 1rem;
-    background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
-    border-radius: 8px;
-    border-left: 4px solid #dc2626;
-}
-
-.section-title {
-    color: var(--primary-color);
-    margin: 0 0 1rem 0;
-    padding: 0.75rem 1rem;
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(99, 102, 241, 0.05) 100%);
-    border-radius: 8px;
-    border-left: 4px solid var(--primary-color);
-}
-
-/* Warning Boxes */
-.warning-box {
-    background: linear-gradient(135deg, #fef3c7 0%, #fed7aa 100%);
-    border: 1px solid #f59e0b;
-    border-radius: 8px;
-    padding: 0.75rem 1rem;
-    margin: 0.5rem 0;
-    color: #92400e;
-    border-left: 4px solid #dc2626;
-}
-
-/* Contact Boxes */
-.contact-box {
-    background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%);
-    border: 1px solid #93c5fd;
-    border-radius: 8px;
     padding: 0.75rem 1rem;
     margin: 0.5rem 0;
     color: #1e40af;
@@ -1059,6 +917,7 @@ function initializeAutocomplete() {
     
     if (input && typeof google !== 'undefined' && google.maps && google.maps.places) {
         try {
+            // Use the original Autocomplete (works better with theming)
             autocomplete = new google.maps.places.Autocomplete(input, {
                 types: ['(cities)'],
                 fields: ['place_id', 'geometry', 'name', 'formatted_address']
@@ -1118,15 +977,28 @@ function displayLocationInfo(data) {
 // Create interactive map
 function createInteractiveMap(lat, lng, title) {
     const mapContainer = document.getElementById('location-map');
-    if (!mapContainer || !google || !google.maps) return;
+    if (!mapContainer) return;
+    
+    // Check if Google Maps is available
+    if (!google || !google.maps) {
+        console.warn('Google Maps not available - hiding map container');
+        mapContainer.style.display = 'none';
+        return;
+    }
 
-    const mapOptions = {
-        center: { lat: lat, lng: lng },
-        zoom: 13,
-        mapTypeId: google.maps.MapTypeId.ROADMAP
-    };
+    try {
+        const mapOptions = {
+            center: { lat: lat, lng: lng },
+            zoom: 13,
+            mapTypeId: google.maps.MapTypeId.ROADMAP
+        };
 
-    map = new google.maps.Map(mapContainer, mapOptions);
+        map = new google.maps.Map(mapContainer, mapOptions);
+    } catch (error) {
+        console.error('Error creating map:', error);
+        mapContainer.style.display = 'none';
+        return;
+    }
 
     let marker;
     
@@ -1403,64 +1275,49 @@ function addLocationInfoToItinerary(data) {
 function formatItinerary(itinerary) {
     currentItinerary = itinerary;
     
-    // Enhanced formatting with organized sections
+    // Simple formatting with divider lines instead of sections
     let formatted = itinerary
         // Remove markdown characters
         .replace(/#{1,6}\s*/g, '') 
-        .replace(/\*\*/g, '') 
-        .replace(/\*/g, '')
+        .replace(/\*\*/g, '<strong>')
+        .replace(/\*/g, '</strong>')
         
-        // Format day headers with section dividers
-        .replace(/Day (\d+):/g, '<div class="section-divider"></div><div class="day-header"><h3>📅 Day $1</h3></div>')
+        // Add divider lines before major sections
+        .replace(/^(Day \d+:)/gm, '<hr class="divider-line"><h3>📅 $1</h3>')
+        .replace(/^(Morning|Afternoon|Evening|Lunch|Dinner|Breakfast)(\s*\([^)]+\))?:/gm, '<hr class="divider-line"><h4>🕐 $1$2:</h4>')
         
-        // Format time periods with structured blocks
-        .replace(/(Morning|Afternoon|Evening|Lunch|Dinner|Breakfast)\s*\(([^)]+)\):/g, 
-            '<div class="time-section"><div class="time-header">🕐 $1 ($2)</div><div class="time-content">')
-        .replace(/(Morning|Afternoon|Evening|Lunch|Dinner|Breakfast):/g, 
-            '<div class="time-section"><div class="time-header">🕐 $1</div><div class="time-content">')
+        // Add divider before major sections
+        .replace(/(SAFETY INFORMATION|Cultural Considerations|Money and Document Safety|Emergency Contacts)/gi, '<hr class="divider-line"><h3>🛡️ $1</h3>')
         
-        // Format activities with structured layout
-        .replace(/^[\s]*-\s*([^:]+):\s*/gm, '<div class="activity-item"><div class="activity-title">$1</div><div class="activity-details">')
-        
-        // Format addresses with Google Maps integration
+        // Format addresses with simple styling
         .replace(/Address:\s*([^\n]+)/g, function(match, address) {
             const cleanAddress = address.trim();
             const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cleanAddress)}`;
-            return `<div class="location-box">
-                <div class="location-address">📍 ${cleanAddress}</div>
-                <div class="maps-actions">
-                    <a href="${mapsUrl}" target="_blank" class="maps-btn">🗺️ View on Maps</a>
-                    <a href="https://www.google.com/maps/dir//${encodeURIComponent(cleanAddress)}" target="_blank" class="directions-btn">🧭 Get Directions</a>
-                </div>
-            </div>`;
+            return `<hr class="divider-line"><p><strong>📍 Address:</strong> ${cleanAddress}</p>
+                    <p><a href="${mapsUrl}" target="_blank" style="color: #3b82f6; text-decoration: none;">🗺️ View on Maps</a> | 
+                    <a href="https://www.google.com/maps/dir//${encodeURIComponent(cleanAddress)}" target="_blank" style="color: #3b82f6; text-decoration: none;">🧭 Get Directions</a></p>`;
         })
         
-        // Format costs in structured boxes
-        .replace(/(?:Estimated cost|Cost)\s*(?:for \d+)?:\s*([^\n]+)/gi, '<div class="cost-box">💰 <strong>Cost:</strong> $1</div>')
+        // Format costs with simple styling
+        .replace(/(?:Estimated cost|Cost)\s*(?:for \d+)?:\s*([^\n]+)/gi, '<hr class="divider-line"><p><strong>💰 Cost:</strong> $1</p>')
         
-        // Format tips in highlighted boxes
-        .replace(/(?:Local Tip|Tip|Cultural Insight):\s*([^\n]+)/gi, '<div class="tip-box">💡 <strong>Tip:</strong> $1</div>')
+        // Format tips with simple styling
+        .replace(/(?:Local Tip|Tip|Cultural Insight):\s*([^\n]+)/gi, '<hr class="divider-line"><p><strong>💡 Tip:</strong> $1</p>')
         
-        // Format major sections with dividers
-        .replace(/(SAFETY INFORMATION)/gi, '<div class="section-divider"></div><div class="safety-section"><h3 class="safety-title">🛡️ $1</h3>')
-        .replace(/(Cultural Considerations)/gi, '<div class="section-divider"></div><div class="culture-section"><h3 class="section-title">🏛️ $1</h3>')
-        .replace(/(Money and Document Safety)/gi, '<div class="section-divider"></div><div class="money-section"><h3 class="section-title">💳 $1</h3>')
-        .replace(/(Emergency Contacts)/gi, '<div class="section-divider"></div><div class="emergency-section"><h3 class="section-title">🚨 $1</h3>')
+        // Format warnings with simple styling
+        .replace(/(?:Safety Warning|Warning|Caution):\s*([^\n]+)/gi, '<hr class="divider-line"><p><strong>⚠️ Warning:</strong> $1</p>')
         
-        // Format safety warnings in alert boxes
-        .replace(/(?:Safety Warning|Warning|Caution):\s*([^\n]+)/gi, '<div class="warning-box">⚠️ <strong>Warning:</strong> $1</div>')
+        // Format emergency contacts with simple styling
+        .replace(/(?:Emergency|Police|Medical|Tourist Help):\s*([^\n]+)/gi, '<hr class="divider-line"><p><strong>📞 Emergency:</strong> $1</p>')
         
-        // Format emergency contacts in contact boxes
-        .replace(/(?:Emergency|Police|Medical|Tourist Help):\s*([^\n]+)/gi, '<div class="contact-box">📞 $1</div>')
-        
-        // Close any open sections
-        .replace(/(<div class="time-content">[^<]*?)(?=<div class="time-section"|<div class="section-divider"|$)/g, '$1</div></div>')
-        .replace(/(<div class="activity-details">[^<]*?)(?=<div class="activity-item"|<div class="time-section"|<div class="section-divider"|$)/g, '$1</div></div>')
+        // Format bullet points
+        .replace(/^[\s]*-\s*([^\n]+)/gm, '<p>• $1</p>')
         
         // Handle line breaks
+        .replace(/\n\n/g, '<br><br>')
         .replace(/\n/g, '<br>');
     
-    return `<div class="formatted-itinerary">${formatted}</div>`;
+    return `<div class="simple-itinerary">${formatted}</div>`;
 }
 
 // Itinerary management functions
