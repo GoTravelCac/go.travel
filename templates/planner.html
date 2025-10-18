@@ -150,6 +150,7 @@
     font-weight: 600;
 }
 
+/* Commented out - no longer using detailed itinerary formatting
 .itinerary-content .time-block {
     background: #f8fafc;
     border: 1px solid #e2e8f0;
@@ -193,12 +194,15 @@
     font-style: italic;
     color: #92400e;
 }
+*/
 
 .formatted-itinerary {
     max-width: 100%;
     overflow-x: auto;
 }
 
+/* Removed all itinerary formatting CSS - using plain text display now */
+/*
 .section-separator {
     border-top: 3px solid #e5e7eb;
     margin: 3rem 0;
@@ -234,6 +238,7 @@
     border-radius: 20px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
+*/
 
 .itinerary-content p {
     margin: 0.75rem 0;
@@ -1140,70 +1145,18 @@ function addLocationInfoToItinerary(data) {
 function formatItinerary(itinerary) {
     currentItinerary = itinerary;
     
-    // Enhanced formatting with better structure
+    // Return plain text with minimal formatting - no fancy styling
     let formatted = itinerary
-        // Remove markdown characters
+        // Just remove markdown characters
         .replace(/#{1,6}\s*/g, '') 
         .replace(/\*\*/g, '') 
-        .replace(/\*/g, '') 
+        .replace(/\*/g, '')
         
-        // Format day headers with visual separators
-        .replace(/Day (\d+):/g, '<div class="section-separator"></div><h3>📅 Day $1</h3>')
-        
-        // Auto-add visual separators before major sections only
-        .replace(/(SAFETY INFORMATION)/gi, '<div class="section-separator"></div>$1')
-        .replace(/(Cultural Considerations)/gi, '<div class="section-separator"></div>$1')
-        .replace(/(Money and Document Safety)/gi, '<div class="section-separator"></div>$1')
-        .replace(/(Emergency Contacts)/gi, '<div class="section-separator"></div>$1')
-        
-        // Format time periods (Morning, Afternoon, Evening)
-        .replace(/(Morning|Afternoon|Evening|Lunch|Dinner|Breakfast)\s*\(([^)]+)\):/g, 
-            '<div class="time-block"><strong>🕐 $1 ($2)</strong>')
-        .replace(/(Morning|Afternoon|Evening|Lunch|Dinner|Breakfast):/g, 
-            '<div class="time-block"><strong>🕐 $1</strong>')
-        
-        // Format activities with bullet points
-        .replace(/^[\s]*-\s*([^:]+):\s*/gm, '<div class="activity"><strong>$1:</strong><br>')
-        
-        // Format addresses with Google Maps links
-        .replace(/Address:\s*([^\n]+)/g, function(match, address) {
-            const cleanAddress = address.trim();
-            const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cleanAddress)}`;
-            return `<div class="location">📍 ${cleanAddress} <a href="${mapsUrl}" target="_blank" class="maps-link">🗺️ View on Maps</a></div>`;
-        })
-        
-        // Format costs
-        .replace(/(?:Estimated cost|Cost)\s*(?:for \d+)?:\s*([^\n]+)/gi, '<div class="cost">💰 $1</div>')
-        
-        // Format tips
-        .replace(/(?:Local Tip|Tip|Cultural Insight):\s*([^\n]+)/gi, '<div class="tip">💡 $1</div>')
-        
-        // Format Safety Information section header
-        .replace(/SAFETY INFORMATION/gi, '<h3 class="safety-header">🛡️ SAFETY INFORMATION</h3>')
-        
-        // Format safety warnings
-        .replace(/(?:Safety Warning|Warning|Caution):\s*([^\n]+)/gi, '<div class="safety-warning">⚠️ $1</div>')
-        
-        // Format emergency contacts
-        .replace(/(?:Emergency|Police|Medical|Tourist Help):\s*([^\n]+)/gi, '<div class="emergency-contact">🚨 $1</div>')
-        
-        // Format transportation
-        .replace(/Transportation:\s*([^\n]+)/gi, '<div class="location">� $1</div>')
-        
-        // Close time blocks and activities
-        .replace(/(<div class="time-block">[^<]*<\/strong>)/g, '$1</div>')
-        .replace(/(<div class="activity">[^<]*<br>)/g, '$1</div>')
-        
-        // Clean up extra whitespace and empty lines
-        .replace(/\n\s*\n\s*\n/g, '\n\n')  // Remove multiple empty lines
-        .replace(/^\s+/gm, '')  // Remove leading whitespace
-        .replace(/\s+$/gm, '')  // Remove trailing whitespace
-        
-        // Handle line breaks and paragraphs
-        .replace(/\n\n/g, '</p><p>')
+        // Convert line breaks to HTML
         .replace(/\n/g, '<br>');
     
-    return `<div class="formatted-itinerary">${formatted}</div>`;
+    return `<div style="white-space: pre-wrap; line-height: 1.6; font-family: inherit;">${formatted}</div>`;
+}
 }
 
 // Itinerary management functions
