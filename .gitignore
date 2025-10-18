@@ -48,3 +48,6 @@ test_*.py
 # API Keys (additional protection)
 **/api-keys.js
 **/config.local.js
+
+# Deployment scripts (local configuration)
+deploy.ps1

@@ -398,18 +398,6 @@ def favicon(filename):
     """Serve favicon files"""
     return send_from_directory('favicon', filename)
 
-@app.route('/api/status', methods=['GET'])
-def api_status():
-    """Check API status"""
-    status = config.get_api_status()
-    status.update({
-        'status': 'online',
-        'google_services_available': google_services is not None,
-        'timestamp': datetime.now().isoformat(),
-        'model': 'gemini-2.5-flash' if config.gemini_model else None
-    })
-    return jsonify(status)
-
 @app.route('/api/destinations', methods=['GET'])
 def get_destinations():
     """Get popular travel destinations with real-time data"""
