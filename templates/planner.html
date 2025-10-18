@@ -1147,12 +1147,8 @@ function formatItinerary(itinerary) {
         .replace(/\*\*/g, '') 
         .replace(/\*/g, '') 
         
-        // Format day headers with separators
+        // Format day headers with visual separators
         .replace(/Day (\d+):/g, '<div class="section-separator"></div><h3>📅 Day $1</h3>')
-        
-        // Remove any -- text separators from the content
-        .replace(/^[\s]*--+[\s]*$/gm, '')
-        .replace(/\n[\s]*--+[\s]*\n/g, '\n')
         
         // Auto-add visual separators before major sections only
         .replace(/(SAFETY INFORMATION)/gi, '<div class="section-separator"></div>$1')
@@ -1305,8 +1301,6 @@ function getPlainTextItinerary() {
         // Clean up excessive whitespace
         .replace(/\s+/g, ' ')
         .replace(/\n\s+/g, '\n')
-        // Handle section separators
-        .replace(/--/g, '\n' + '─'.repeat(50) + '\n')
         // Add proper spacing around day headers
         .replace(/(Day\s+\d+[:\s]*[^\n]*)/gi, '\n\n📅 $1\n')
         // Add spacing around time periods
