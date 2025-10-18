@@ -854,26 +854,26 @@ LOCATION & SAFETY REQUIREMENTS:
 - Include approximate time needed for each activity
 - Mention any group rates or family packages available
 
-FORMAT:
-- Use clear headings for each day
-- Organize activities by time of day
-- IMPORTANT: Use exactly "--" on its own line as a separator between major sections
-- Add "--" separator after each day's activities
-- Add "--" separator before the SAFETY INFORMATION section
-- Add "--" separator between different types of content (activities, dining, transportation)
-- Do not include any *, **, or # characters, use indents, hyphens, and em dashes for clearer formatting
+FORMAT & STRUCTURE:
+- Use clear headings for each day (Day 1:, Day 2:, etc.)
+- Organize activities by time of day (Morning, Afternoon, Evening)
+- Do not include any *, **, or # characters, use indents, hyphens, and em dashes for cleaner formatting
 - Make it engaging and informative with natural text formatting
 - Include practical details and insider tips
 - Include weather considerations and timezone information when available
 - End with a comprehensive "SAFETY INFORMATION" section
-- Add proper spacing between sections for better readability
+- Structure with clear section breaks for better readability
 
-EXAMPLE SEPARATOR USAGE:
-Day 1: [activities]
---
-Day 2: [activities]  
---
-SAFETY INFORMATION
+REQUIRED SECTION STRUCTURE:
+1. Day 1 activities and details
+2. Day 2 activities and details (if multi-day)
+3. Additional days as needed
+4. SAFETY INFORMATION (always include this major section)
+5. Cultural Considerations and Local Customs
+6. Money and Document Safety Tips
+7. Emergency Contacts
+
+Each major section should be clearly separated for easy reading and organization.
 
 Please create a comprehensive, well-structured itinerary that maximizes the travel experience while being practical, actionable, and safe."""
 

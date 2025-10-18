@@ -1147,13 +1147,18 @@ function formatItinerary(itinerary) {
         .replace(/\*\*/g, '') 
         .replace(/\*/g, '') 
         
-        // Format section separators - more flexible pattern
-        .replace(/^[\s]*--[\s]*$/gm, '<div class="section-separator"></div>')
-        .replace(/\n--\n/g, '\n<div class="section-separator"></div>\n')
-        .replace(/--/g, '<div class="section-separator"></div>')
+        // Format day headers first
+        .replace(/Day (\d+):/g, '<div class="section-separator"></div><h3>📅 Day $1</h3>')
         
-        // Format day headers
-        .replace(/Day (\d+):/g, '<h3>📅 Day $1</h3>')
+        // Format section separators - multiple patterns for reliability
+        .replace(/^[\s]*--+[\s]*$/gm, '<div class="section-separator"></div>')
+        .replace(/\n[\s]*--+[\s]*\n/g, '\n<div class="section-separator"></div>\n')
+        
+        // Auto-add separators before major sections
+        .replace(/(SAFETY INFORMATION)/gi, '<div class="section-separator"></div>$1')
+        .replace(/(Cultural Considerations)/gi, '<div class="section-separator"></div>$1')
+        .replace(/(Money and Document Safety)/gi, '<div class="section-separator"></div>$1')
+        .replace(/(Emergency Contacts)/gi, '<div class="section-separator"></div>$1')
         
         // Format time periods (Morning, Afternoon, Evening)
         .replace(/(Morning|Afternoon|Evening|Lunch|Dinner|Breakfast)\s*\(([^)]+)\):/g, 
