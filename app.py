@@ -342,6 +342,45 @@ def about():
     """Serve the about page"""
     return render_template('about.html', google_api_key=config.google_api_key)
 
+@app.route('/api/status')
+def api_status():
+    """Check the status of all configured APIs"""
+    status = {
+        'timestamp': datetime.now().isoformat(),
+        'apis': {
+            'gemini': {
+                'configured': config.gemini_api_key is not None,
+                'model_available': config.gemini_model is not None,
+                'key_preview': f"{config.gemini_api_key[:10]}..." if config.gemini_api_key else None
+            },
+            'google': {
+                'configured': config.google_api_key is not None,
+                'services_available': google_services is not None,
+                'key_preview': f"{config.google_api_key[:10]}..." if config.google_api_key else None,
+                'services': [
+                    'Maps JavaScript API',
+                    'Places API',
+                    'Geocoding API',
+                    'Directions API',
+                    'Time Zone API',
+                    'Roads API'
+                ]
+            },
+            'openweather': {
+                'configured': config.openweathermap_api_key is not None,
+                'key_preview': f"{config.openweathermap_api_key[:10]}..." if config.openweathermap_api_key else None
+            }
+        },
+        'overall_status': 'healthy' if all([
+            config.gemini_api_key,
+            config.google_api_key,
+            config.openweathermap_api_key,
+            config.gemini_model
+        ]) else 'degraded'
+    }
+    
+    return jsonify(status)
+
 # Legacy route for backwards compatibility
 @app.route('/index')
 def index():
