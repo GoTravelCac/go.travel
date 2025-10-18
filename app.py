@@ -857,12 +857,13 @@ LOCATION & SAFETY REQUIREMENTS:
 FORMAT & STRUCTURE:
 - Use clear headings for each day (Day 1:, Day 2:, etc.)
 - Organize activities by time of day (Morning, Afternoon, Evening)
+- Do NOT use any separators like -- or === in your text
 - Do not include any *, **, or # characters, use indents, hyphens, and em dashes for cleaner formatting
 - Make it engaging and informative with natural text formatting
 - Include practical details and insider tips
 - Include weather considerations and timezone information when available
 - End with a comprehensive "SAFETY INFORMATION" section
-- Structure with clear section breaks for better readability
+- Write content continuously without manual separators - the system will add visual dividers automatically
 
 REQUIRED SECTION STRUCTURE:
 1. Day 1 activities and details
@@ -873,7 +874,7 @@ REQUIRED SECTION STRUCTURE:
 6. Money and Document Safety Tips
 7. Emergency Contacts
 
-Each major section should be clearly separated for easy reading and organization.
+Write clean, flowing text - visual separators will be added automatically by the system.
 
 Please create a comprehensive, well-structured itinerary that maximizes the travel experience while being practical, actionable, and safe."""
 

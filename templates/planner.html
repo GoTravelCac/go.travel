@@ -1147,14 +1147,14 @@ function formatItinerary(itinerary) {
         .replace(/\*\*/g, '') 
         .replace(/\*/g, '') 
         
-        // Format day headers first
+        // Format day headers with separators
         .replace(/Day (\d+):/g, '<div class="section-separator"></div><h3>📅 Day $1</h3>')
         
-        // Format section separators - multiple patterns for reliability
-        .replace(/^[\s]*--+[\s]*$/gm, '<div class="section-separator"></div>')
-        .replace(/\n[\s]*--+[\s]*\n/g, '\n<div class="section-separator"></div>\n')
+        // Remove any -- text separators from the content
+        .replace(/^[\s]*--+[\s]*$/gm, '')
+        .replace(/\n[\s]*--+[\s]*\n/g, '\n')
         
-        // Auto-add separators before major sections
+        // Auto-add visual separators before major sections only
         .replace(/(SAFETY INFORMATION)/gi, '<div class="section-separator"></div>$1')
         .replace(/(Cultural Considerations)/gi, '<div class="section-separator"></div>$1')
         .replace(/(Money and Document Safety)/gi, '<div class="section-separator"></div>$1')
@@ -1197,6 +1197,11 @@ function formatItinerary(itinerary) {
         // Close time blocks and activities
         .replace(/(<div class="time-block">[^<]*<\/strong>)/g, '$1</div>')
         .replace(/(<div class="activity">[^<]*<br>)/g, '$1</div>')
+        
+        // Clean up extra whitespace and empty lines
+        .replace(/\n\s*\n\s*\n/g, '\n\n')  // Remove multiple empty lines
+        .replace(/^\s+/gm, '')  // Remove leading whitespace
+        .replace(/\s+$/gm, '')  // Remove trailing whitespace
         
         // Handle line breaks and paragraphs
         .replace(/\n\n/g, '</p><p>')
