@@ -101,11 +101,28 @@
     text-align: center;
     transition: all 0.3s ease;
     border-top: 4px solid var(--primary-color);
+    position: relative;
+    overflow: hidden;
+}
+
+.mission-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-color), var(--accent-color), var(--primary-color));
+    transition: left 0.8s ease;
 }
 
 .mission-card:hover {
     transform: translateY(-8px);
     box-shadow: var(--shadow-lg);
+}
+
+.mission-card:hover::before {
+    left: 0;
 }
 
 .mission-icon {
@@ -209,6 +226,12 @@
     font-size: 3rem;
     margin-bottom: 1.5rem;
     display: block;
+    transition: all 0.3s ease;
+}
+
+.feature-showcase:hover .feature-showcase-icon {
+    transform: scale(1.1);
+    filter: drop-shadow(0 4px 8px rgba(var(--primary-color-rgb), 0.3));
 }
 
 .feature-showcase h3 {
@@ -463,7 +486,7 @@
                 <div class="mission-card">
                     <div class="mission-icon">🚀</div>
                     <h3>Innovation</h3>
-                    <p>We harness the latest in AI technology, specifically Google's Gemini 2.0 Flash model, to understand your travel preferences and create unique experiences tailored just for you.</p>
+                    <p>We harness the latest in AI technology, specifically Google's Gemini 2.5 Flash model, to understand your travel preferences and create unique experiences tailored just for you.</p>
                 </div>
                 <div class="mission-card">
                     <div class="mission-icon">🌍</div>
@@ -493,7 +516,7 @@
                 <div class="tech-card">
                     <h4>🤖 Artificial Intelligence</h4>
                     <ul class="tech-list">
-                        <li>Google Gemini 2.0 Flash</li>
+                        <li>Google Gemini 2.5 Flash</li>
                         <li>Natural Language Processing</li>
                         <li>Machine Learning Algorithms</li>
                         <li>Personalization Engine</li>
@@ -542,13 +565,15 @@
             <div class="features-showcase-grid">
                 <div class="feature-showcase">
                     <div class="feature-showcase-icon">🎯</div>
-                    <h3>Personalized Itineraries</h3>
-                    <p>AI-generated travel plans tailored to your specific interests, budget, and travel style.</p>
+                    <h3>Comprehensive Planning</h3>
+                    <p>AI-generated travel plans with detailed preferences for every aspect of your journey.</p>
                     <ul class="feature-list">
-                        <li>Custom duration planning</li>
-                        <li>Budget-conscious recommendations</li>
-                        <li>Interest-based activities</li>
-                        <li>Travel style matching</li>
+                        <li>Lodging preferences (hotels, Airbnb, hostels)</li>
+                        <li>Transportation options (air, ground, rail, local)</li>
+                        <li>Family-friendly planning with children considerations</li>
+                        <li>Budget categories (economy, mid-range, luxury)</li>
+                        <li>Interest-based activities and attractions</li>
+                        <li>Custom duration and travel style matching</li>
                     </ul>
                 </div>
                 <div class="feature-showcase">
