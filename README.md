@@ -1,6 +1,6 @@
 # 🌍 go.travel - Travel Itinerary Generator
 
-# **Live Website:** https://gotravel-app-407949658262.us-central1.run.app
+# **Live Website:** [https://gotravel-app-407949658262.us-central1.run.app](https://gotravel-41611891727.us-central1.run.app/)
 
 ## 🛠️ Technology Stack
 
