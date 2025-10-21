@@ -48,29 +48,6 @@
     transition: border-color 0.3s ease;
 }
 
-/* Styling for the new PlaceAutocompleteElement */
-gmp-place-autocomplete {
-    width: 100% !important;
-    display: block !important;
-}
-
-gmp-place-autocomplete input {
-    width: 100% !important;
-    padding: 0.75rem !important;
-    border: 1px solid #e5e7eb !important;
-    border-radius: var(--border-radius) !important;
-    font-size: 1rem !important;
-    transition: border-color 0.3s ease !important;
-    background: var(--white) !important;
-    color: var(--text-color) !important;
-}
-
-gmp-place-autocomplete input:focus {
-    outline: none !important;
-    border-color: var(--primary-color) !important;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
-}
-
 .form-group input:focus,
 .form-group textarea:focus,
 .form-group select:focus {
@@ -940,49 +917,20 @@ function initializeAutocomplete() {
     
     if (input && typeof google !== 'undefined' && google.maps && google.maps.places) {
         try {
-            // Check if PlaceAutocompleteElement is available (new API)
-            if (google.maps.places.PlaceAutocompleteElement) {
-                // Create the new PlaceAutocompleteElement (minimal configuration)
-                const autocompleteElement = new google.maps.places.PlaceAutocompleteElement();
-                
-                // Copy all attributes from the original input
-                autocompleteElement.id = input.id;
-                autocompleteElement.name = input.name;
-                autocompleteElement.required = input.required;
-                autocompleteElement.placeholder = input.placeholder || 'Enter your destination city...';
-                autocompleteElement.className = input.className;
-                
-                // Replace the input with the autocomplete element
-                input.parentNode.replaceChild(autocompleteElement, input);
-                
-                autocompleteElement.addEventListener('gmp-placeselect', (event) => {
-                    const place = event.place;
-                    if (place.geometry) {
-                        loadLocationInfo(place.formattedAddress || place.displayName);
-                    }
-                });
-                
-                autocomplete = autocompleteElement;
-                console.log('Using new PlaceAutocompleteElement');
-            } else {
-                // Fallback to original Autocomplete for compatibility
-                autocomplete = new google.maps.places.Autocomplete(input, {
-                    types: ['(cities)'],
-                    fields: ['place_id', 'geometry', 'name', 'formatted_address']
-                });
+            // Use the original Autocomplete (works better with theming)
+            autocomplete = new google.maps.places.Autocomplete(input, {
+                types: ['(cities)'],
+                fields: ['place_id', 'geometry', 'name', 'formatted_address']
+            });
 
-                autocomplete.addListener('place_changed', function() {
-                    const place = autocomplete.getPlace();
-                    if (place.geometry) {
-                        loadLocationInfo(place.formatted_address || place.name);
-                    }
-                });
-                console.log('Using legacy Autocomplete');
-            }
+            autocomplete.addListener('place_changed', function() {
+                const place = autocomplete.getPlace();
+                if (place.geometry) {
+                    loadLocationInfo(place.formatted_address || place.name);
+                }
+            });
         } catch (error) {
             console.error('Error creating autocomplete:', error);
-            // If both fail, at least keep the input functional
-            console.log('Autocomplete initialization failed, input will work as regular text field');
         }
     }
 }
@@ -1197,16 +1145,7 @@ document.getElementById('tripForm').addEventListener('submit', async function(e)
     e.preventDefault();
     
     const formData = new FormData(e.target);
-    let destination = formData.get('destination');
-    
-    // Handle PlaceAutocompleteElement if it doesn't have a value in FormData
-    if (!destination) {
-        const autocompleteElement = document.getElementById('destination');
-        if (autocompleteElement && autocompleteElement.tagName.toLowerCase() === 'gmp-place-autocomplete') {
-            destination = autocompleteElement.value || autocompleteElement.querySelector('input')?.value;
-        }
-    }
-    
+    const destination = formData.get('destination');
     const startDate = formData.get('startDate');
     const endDate = formData.get('endDate');
     const people = formData.get('people');
