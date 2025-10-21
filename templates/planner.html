@@ -48,6 +48,29 @@
     transition: border-color 0.3s ease;
 }
 
+/* Styling for the new PlaceAutocompleteElement */
+gmp-place-autocomplete {
+    width: 100% !important;
+    display: block !important;
+}
+
+gmp-place-autocomplete input {
+    width: 100% !important;
+    padding: 0.75rem !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: var(--border-radius) !important;
+    font-size: 1rem !important;
+    transition: border-color 0.3s ease !important;
+    background: var(--white) !important;
+    color: var(--text-color) !important;
+}
+
+gmp-place-autocomplete input:focus {
+    outline: none !important;
+    border-color: var(--primary-color) !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+}
+
 .form-group input:focus,
 .form-group textarea:focus,
 .form-group select:focus {
@@ -917,20 +940,53 @@ function initializeAutocomplete() {
     
     if (input && typeof google !== 'undefined' && google.maps && google.maps.places) {
         try {
-            // Use the original Autocomplete (works better with theming)
-            autocomplete = new google.maps.places.Autocomplete(input, {
-                types: ['(cities)'],
-                fields: ['place_id', 'geometry', 'name', 'formatted_address']
-            });
+            // Check if PlaceAutocompleteElement is available (new API)
+            if (google.maps.places.PlaceAutocompleteElement) {
+                // Create the new PlaceAutocompleteElement
+                const autocompleteElement = new google.maps.places.PlaceAutocompleteElement({
+                    componentRestrictions: { country: [] }, // Allow all countries
+                    fields: ['place_id', 'geometry', 'name', 'formatted_address'],
+                    types: ['(cities)']
+                });
+                
+                // Copy all attributes from the original input
+                autocompleteElement.id = input.id;
+                autocompleteElement.name = input.name;
+                autocompleteElement.required = input.required;
+                autocompleteElement.placeholder = input.placeholder || 'Enter your destination city...';
+                autocompleteElement.className = input.className;
+                
+                // Replace the input with the autocomplete element
+                input.parentNode.replaceChild(autocompleteElement, input);
+                
+                autocompleteElement.addEventListener('gmp-placeselect', (event) => {
+                    const place = event.place;
+                    if (place.geometry) {
+                        loadLocationInfo(place.formattedAddress || place.displayName);
+                    }
+                });
+                
+                autocomplete = autocompleteElement;
+                console.log('Using new PlaceAutocompleteElement');
+            } else {
+                // Fallback to original Autocomplete for compatibility
+                autocomplete = new google.maps.places.Autocomplete(input, {
+                    types: ['(cities)'],
+                    fields: ['place_id', 'geometry', 'name', 'formatted_address']
+                });
 
-            autocomplete.addListener('place_changed', function() {
-                const place = autocomplete.getPlace();
-                if (place.geometry) {
-                    loadLocationInfo(place.formatted_address || place.name);
-                }
-            });
+                autocomplete.addListener('place_changed', function() {
+                    const place = autocomplete.getPlace();
+                    if (place.geometry) {
+                        loadLocationInfo(place.formatted_address || place.name);
+                    }
+                });
+                console.log('Using legacy Autocomplete');
+            }
         } catch (error) {
             console.error('Error creating autocomplete:', error);
+            // If both fail, at least keep the input functional
+            console.log('Autocomplete initialization failed, input will work as regular text field');
         }
     }
 }
@@ -1071,11 +1127,12 @@ function startLoadingMessages(isUpdate = false) {
         'Finalizing your perfect trip...'
     ] : [
         'Creating your perfect itinerary...',
+        'This usually takes 2-3 minutes...',
         'Analyzing the best destinations...',
         'Finding amazing restaurants...',
         'Calculating optimal routes...',
         'Adding local insider tips...',
-        'Finalizing your adventure...'
+        'Almost ready - finalizing your adventure...'
     ];
     
     let messageIndex = 0;
@@ -1093,7 +1150,7 @@ function startLoadingMessages(isUpdate = false) {
                     }
                 }, 300);
             }
-        }, 2000);
+        }, 2500);
         
         // Store interval for cleanup
         window.loadingMessageInterval = interval;
@@ -1108,12 +1165,52 @@ function stopLoadingMessages() {
     }
 }
 
+// Browser notification function
+function showNotification(title, message, options = {}) {
+    // Check if notifications are supported
+    if (!("Notification" in window)) {
+        console.log("This browser does not support notifications");
+        return;
+    }
+    
+    // Check permission status
+    if (Notification.permission === "granted") {
+        new Notification(title, {
+            body: message,
+            icon: '/favicon/favicon-96x96.png',
+            badge: '/favicon/favicon-96x96.png',
+            ...options
+        });
+    } else if (Notification.permission !== "denied") {
+        // Request permission
+        Notification.requestPermission().then(permission => {
+            if (permission === "granted") {
+                new Notification(title, {
+                    body: message,
+                    icon: '/favicon/favicon-96x96.png',
+                    badge: '/favicon/favicon-96x96.png',
+                    ...options
+                });
+            }
+        });
+    }
+}
+
 // Form submission
 document.getElementById('tripForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     
     const formData = new FormData(e.target);
-    const destination = formData.get('destination');
+    let destination = formData.get('destination');
+    
+    // Handle PlaceAutocompleteElement if it doesn't have a value in FormData
+    if (!destination) {
+        const autocompleteElement = document.getElementById('destination');
+        if (autocompleteElement && autocompleteElement.tagName.toLowerCase() === 'gmp-place-autocomplete') {
+            destination = autocompleteElement.value || autocompleteElement.querySelector('input')?.value;
+        }
+    }
+    
     const startDate = formData.get('startDate');
     const endDate = formData.get('endDate');
     const people = formData.get('people');
@@ -1141,6 +1238,14 @@ document.getElementById('tripForm').addEventListener('submit', async function(e)
     const end = new Date(endDate);
     const timeDifference = end.getTime() - start.getTime();
     const duration = Math.ceil(timeDifference / (1000 * 3600 * 24)) + 1;
+    
+    // Request notification permission if not already granted
+    if ("Notification" in window && Notification.permission === "default") {
+        Notification.requestPermission();
+    }
+    
+    // Show initial time estimate message
+    showMessage('⏱️ Starting itinerary generation... This typically takes 2-3 minutes.', 'info');
     
     // Show loading
     const generateBtn = document.getElementById('generateBtn');
@@ -1194,8 +1299,12 @@ document.getElementById('tripForm').addEventListener('submit', async function(e)
                 // Show management section
                 document.getElementById('itineraryManagement').style.display = 'block';
                 
-                // Show success message first
-                showMessage('Itinerary generated successfully!', 'success');
+                // Show success message and notification
+                showMessage('🎉 Your itinerary is ready!', 'success');
+                showNotification('🎉 Itinerary Complete!', `Your ${destination} travel plan is ready to explore!`, {
+                    tag: 'itinerary-complete',
+                    requireInteraction: true
+                });
                 
                 // Auto-scroll to results section after success notification is visible
                 setTimeout(() => {
