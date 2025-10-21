@@ -942,12 +942,8 @@ function initializeAutocomplete() {
         try {
             // Check if PlaceAutocompleteElement is available (new API)
             if (google.maps.places.PlaceAutocompleteElement) {
-                // Create the new PlaceAutocompleteElement
-                const autocompleteElement = new google.maps.places.PlaceAutocompleteElement({
-                    componentRestrictions: { country: [] }, // Allow all countries
-                    fields: ['place_id', 'geometry', 'name', 'formatted_address'],
-                    types: ['(cities)']
-                });
+                // Create the new PlaceAutocompleteElement (minimal configuration)
+                const autocompleteElement = new google.maps.places.PlaceAutocompleteElement();
                 
                 // Copy all attributes from the original input
                 autocompleteElement.id = input.id;
