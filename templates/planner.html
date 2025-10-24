@@ -959,7 +959,6 @@ function initializeAutocomplete() {
             autocomplete = new google.maps.places.Autocomplete(input, {
                 types: ['(regions)'], // This includes cities, countries, states, provinces, etc.
                 fields: ['place_id', 'geometry', 'name', 'formatted_address', 'types', 'address_components'],
-                componentRestrictions: {}, // Remove any country restrictions
                 strictBounds: false, // Don't restrict to viewport
                 bounds: null // Remove location bias completely
             });
