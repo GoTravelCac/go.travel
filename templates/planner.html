@@ -56,6 +56,38 @@
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
 
+.currency-info {
+    margin-top: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    border-radius: 8px;
+    border-left: 4px solid var(--accent-color);
+    animation: slideDown 0.3s ease-out;
+}
+
+.currency-display {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--text-light);
+}
+
+.currency-icon {
+    font-size: 1.1rem;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 .form-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -685,7 +717,13 @@
         <div class="form-group">
             <label for="destination">🌍 Where do you want to go?</label>
             <div class="destination-input-container">
-                <input type="text" id="destination" name="destination" placeholder="Enter your destination (e.g., Paris, France)" autocomplete="off" required>
+                <input type="text" id="destination" name="destination" placeholder="Enter destination: city, country, or region (e.g., Paris, France or Japan)" autocomplete="off" required>
+                <div id="currencyInfo" class="currency-info" style="display: none;">
+                    <div class="currency-display">
+                        <span class="currency-icon">💱</span>
+                        <span id="currencyText">Local currency information will appear here</span>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -917,20 +955,58 @@ function initializeAutocomplete() {
     
     if (input && typeof google !== 'undefined' && google.maps && google.maps.places) {
         try {
-            // Use the original Autocomplete (works better with theming)
+            // Use the original Autocomplete with expanded search options
             autocomplete = new google.maps.places.Autocomplete(input, {
-                types: ['(cities)'],
-                fields: ['place_id', 'geometry', 'name', 'formatted_address']
+                types: ['(regions)'], // This includes cities, countries, states, provinces, etc.
+                fields: ['place_id', 'geometry', 'name', 'formatted_address', 'types', 'address_components'],
+                componentRestrictions: {}, // Remove any country restrictions
+                strictBounds: false, // Don't restrict to viewport
+                bounds: null // Remove location bias completely
             });
+
+            // Remove any location bias for global search
+            autocomplete.setBounds(null);
 
             autocomplete.addListener('place_changed', function() {
                 const place = autocomplete.getPlace();
-                if (place.geometry) {
-                    loadLocationInfo(place.formatted_address || place.name);
+                if (place.geometry || place.name) {
+                    // Use formatted_address if available, otherwise use name
+                    const location = place.formatted_address || place.name;
+                    loadLocationInfo(location);
+                    
+                    // Update currency info if the function exists
+                    if (typeof updateCurrencyInfo === 'function') {
+                        clearTimeout(window.currencyTimeout);
+                        window.currencyTimeout = setTimeout(() => {
+                            updateCurrencyInfo(location);
+                        }, 500);
+                    }
                 }
             });
         } catch (error) {
             console.error('Error creating autocomplete:', error);
+            console.log('Falling back to cities-only autocomplete');
+            
+            // Fallback to basic cities autocomplete
+            try {
+                autocomplete = new google.maps.places.Autocomplete(input, {
+                    types: ['(cities)'],
+                    fields: ['place_id', 'geometry', 'name', 'formatted_address'],
+                    bounds: null
+                });
+                
+                autocomplete.setBounds(null);
+                
+                autocomplete.addListener('place_changed', function() {
+                    const place = autocomplete.getPlace();
+                    if (place.geometry || place.name) {
+                        const location = place.formatted_address || place.name;
+                        loadLocationInfo(location);
+                    }
+                });
+            } catch (fallbackError) {
+                console.error('Fallback autocomplete also failed:', fallbackError);
+            }
         }
     }
 }
@@ -1224,11 +1300,23 @@ document.getElementById('tripForm').addEventListener('submit', async function(e)
             if (data.success) {
                 currentDestination = destination;
                 
+                // Debug: Log the raw itinerary content
+                console.log('Raw itinerary received:', data.itinerary ? data.itinerary.substring(0, 200) + '...' : 'EMPTY');
+                
+                // Check if itinerary content exists
+                if (!data.itinerary || data.itinerary.trim() === '') {
+                    throw new Error('Empty itinerary received from server');
+                }
+                
                 // Format itinerary with location information
                 let fullItinerary = formatItinerary(data.itinerary);
                 if (data.location_info) {
                     fullItinerary = addLocationInfoToItinerary(data.location_info) + fullItinerary;
                 }
+                
+                // Debug: Log the formatted content
+                console.log('Formatted itinerary length:', fullItinerary.length);
+                
                 itineraryContent.innerHTML = fullItinerary;
                 
                 // Show management section
@@ -1319,49 +1407,81 @@ function addLocationInfoToItinerary(data) {
 function formatItinerary(itinerary) {
     currentItinerary = itinerary;
     
-    // Simple formatting with divider lines instead of sections
-    let formatted = itinerary
-        // Remove markdown characters
-        .replace(/#{1,6}\s*/g, '') 
-        .replace(/\*\*/g, '<strong>')
-        .replace(/\*/g, '</strong>')
-        
-        // Add divider lines before major sections
-        .replace(/^(Day \d+:)/gm, '<hr class="divider-line"><h3>📅 $1</h3>')
-        .replace(/^(Morning|Afternoon|Evening|Lunch|Dinner|Breakfast)(\s*\([^)]+\))?:/gm, '<hr class="divider-line"><h4>🕐 $1$2:</h4>')
-        
-        // Add divider before major sections
-        .replace(/(SAFETY INFORMATION|Cultural Considerations|Money and Document Safety|Emergency Contacts)/gi, '<hr class="divider-line"><h3>🛡️ $1</h3>')
-        
-        // Format addresses with simple styling
-        .replace(/Address:\s*([^\n]+)/g, function(match, address) {
-            const cleanAddress = address.trim();
-            const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cleanAddress)}`;
-            return `<hr class="divider-line"><p><strong>📍 Address:</strong> ${cleanAddress}</p>
-                    <p><a href="${mapsUrl}" target="_blank" style="color: #3b82f6; text-decoration: none;">🗺️ View on Maps</a> | 
-                    <a href="https://www.google.com/maps/dir//${encodeURIComponent(cleanAddress)}" target="_blank" style="color: #3b82f6; text-decoration: none;">🧭 Get Directions</a></p>`;
-        })
-        
-        // Format costs with simple styling
-        .replace(/(?:Estimated cost|Cost)\s*(?:for \d+)?:\s*([^\n]+)/gi, '<hr class="divider-line"><p><strong>💰 Cost:</strong> $1</p>')
-        
-        // Format tips with simple styling
-        .replace(/(?:Local Tip|Tip|Cultural Insight):\s*([^\n]+)/gi, '<hr class="divider-line"><p><strong>💡 Tip:</strong> $1</p>')
-        
-        // Format warnings with simple styling
-        .replace(/(?:Safety Warning|Warning|Caution):\s*([^\n]+)/gi, '<hr class="divider-line"><p><strong>⚠️ Warning:</strong> $1</p>')
-        
-        // Format emergency contacts with simple styling
-        .replace(/(?:Emergency|Police|Medical|Tourist Help):\s*([^\n]+)/gi, '<hr class="divider-line"><p><strong>📞 Emergency:</strong> $1</p>')
-        
-        // Format bullet points
-        .replace(/^[\s]*-\s*([^\n]+)/gm, '<p>• $1</p>')
-        
-        // Handle line breaks
-        .replace(/\n\n/g, '<br><br>')
-        .replace(/\n/g, '<br>');
+    if (!itinerary || itinerary.trim() === '') {
+        return '<div class="simple-itinerary"><p>No itinerary content available.</p></div>';
+    }
     
-    return `<div class="simple-itinerary">${formatted}</div>`;
+    try {
+        // Simple formatting with divider lines instead of sections
+        let formatted = itinerary
+            // First, handle markdown bold formatting properly
+            .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+            // Remove remaining single asterisks and hash marks
+            .replace(/#{1,6}\s*/g, '') 
+            .replace(/\*/g, '')
+            
+            // Add divider lines before major sections (but preserve content)
+            .replace(/^(Day \d+:)/gm, '<hr class="divider-line"><h3>📅 $1</h3>')
+            .replace(/^(Morning|Afternoon|Evening|Lunch|Dinner|Breakfast)(\s*\([^)]+\))?:/gm, '<hr class="divider-line"><h4>🕐 $1$2:</h4>')
+            
+            // Add divider before major sections
+            .replace(/(SAFETY INFORMATION|Cultural Considerations|Money and Document Safety|Emergency Contacts|CURRENCY|BUDGET)/gi, '<hr class="divider-line"><h3>🛡️ $1</h3>')
+            
+            // Format addresses with simple styling
+            .replace(/Address:\s*([^\n]+)/g, function(match, address) {
+                const cleanAddress = address.trim();
+                if (!cleanAddress) return match;
+                const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cleanAddress)}`;
+                return `<hr class="divider-line"><p><strong>📍 Address:</strong> ${cleanAddress}</p>
+                        <p><a href="${mapsUrl}" target="_blank" style="color: #3b82f6; text-decoration: none;">🗺️ View on Maps</a> | 
+                        <a href="https://www.google.com/maps/dir//${encodeURIComponent(cleanAddress)}" target="_blank" style="color: #3b82f6; text-decoration: none;">🧭 Get Directions</a></p>`;
+            })
+            
+            // Format costs with simple styling - improved pattern
+            .replace(/(?:Estimated cost|Cost|Price)(?:\s*for \d+ people?)?:\s*([^\n]+)/gi, '<hr class="divider-line"><p><strong>💰 Cost:</strong> $1</p>')
+            
+            // Format tips with simple styling
+            .replace(/(?:Local Tip|Tip|Cultural Insight):\s*([^\n]+)/gi, '<hr class="divider-line"><p><strong>💡 Tip:</strong> $1</p>')
+            
+            // Format warnings with simple styling
+            .replace(/(?:Safety Warning|Warning|Caution):\s*([^\n]+)/gi, '<hr class="divider-line"><p><strong>⚠️ Warning:</strong> $1</p>')
+            
+            // Format emergency contacts with simple styling
+            .replace(/(?:Emergency|Police|Medical|Tourist Help):\s*([^\n]+)/gi, '<hr class="divider-line"><p><strong>📞 Emergency:</strong> $1</p>')
+            
+            // Format bullet points more carefully - only match actual bullet points
+            .replace(/^[\s]*[-•]\s*([^\n]+)/gm, '<p>• $1</p>')
+            
+            // Handle multiple consecutive line breaks first
+            .replace(/\n{3,}/g, '\n\n')
+            // Then handle double line breaks
+            .replace(/\n\n+/g, '<br><br>')
+            // Finally handle single line breaks
+            .replace(/\n/g, '<br>');
+        
+        // Clean up any empty paragraphs or broken HTML
+        formatted = formatted
+            .replace(/<p>\s*<\/p>/g, '')
+            .replace(/<br>\s*<br>\s*<br>/g, '<br><br>')
+            .replace(/^\s*<br>/, '')
+            .replace(/<br>\s*$/g, '');
+        
+        // Ensure we still have content after formatting
+        if (!formatted || formatted.trim() === '') {
+            console.warn('Formatting resulted in empty content, using fallback');
+            return `<div class="simple-itinerary"><pre style="white-space: pre-wrap; font-family: inherit;">${itinerary}</pre></div>`;
+        }
+        
+        return `<div class="simple-itinerary">${formatted}</div>`;
+        
+    } catch (error) {
+        console.error('Error formatting itinerary:', error);
+        // Fallback to basic formatting if regex fails
+        const fallback = itinerary
+            .replace(/\n/g, '<br>')
+            .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+        return `<div class="simple-itinerary">${fallback}</div>`;
+    }
 }
 
 // Itinerary management functions
@@ -1663,10 +1783,71 @@ function setupChildrenValidation() {
     validateChildren();
 }
 
+// Setup currency information display
+function setupCurrencyInfo() {
+    const destinationInput = document.getElementById('destination');
+    const currencyInfo = document.getElementById('currencyInfo');
+    const currencyText = document.getElementById('currencyText');
+    let currencyTimeout;
+    
+    if (!destinationInput || !currencyInfo || !currencyText) return;
+    
+    async function updateCurrencyInfo(destination) {
+        if (!destination || destination.length < 3) {
+            currencyInfo.style.display = 'none';
+            return;
+        }
+        
+        try {
+            currencyText.textContent = 'Loading currency information...';
+            currencyInfo.style.display = 'block';
+            
+            const response = await fetch(`${CONFIG.BACKEND_URL}/api/currency/${encodeURIComponent(destination)}`);
+            const data = await response.json();
+            
+            if (data.success) {
+                currencyText.textContent = `${data.local_currency} - ${data.formatted_rate}`;
+                currencyInfo.style.display = 'block';
+            } else {
+                currencyInfo.style.display = 'none';
+            }
+        } catch (error) {
+            console.error('Currency lookup error:', error);
+            currencyInfo.style.display = 'none';
+        }
+    }
+    
+    destinationInput.addEventListener('input', function() {
+        clearTimeout(currencyTimeout);
+        const destination = this.value.trim();
+        
+        if (destination.length < 3) {
+            currencyInfo.style.display = 'none';
+            return;
+        }
+        
+        // Debounce the currency lookup
+        currencyTimeout = setTimeout(() => {
+            updateCurrencyInfo(destination);
+        }, 1000);
+    });
+    
+    destinationInput.addEventListener('blur', function() {
+        const destination = this.value.trim();
+        if (destination.length >= 3) {
+            clearTimeout(currencyTimeout);
+            updateCurrencyInfo(destination);
+        }
+    });
+}
+
 // Fallback initialization for duration calculation if Google Maps fails
 document.addEventListener('DOMContentLoaded', function() {
     // Setup children validation
     setupChildrenValidation();
+    
+    // Setup currency information display
+    setupCurrencyInfo();
     
     // Add a small delay to allow Google Maps to load first
     setTimeout(function() {

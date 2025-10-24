@@ -237,6 +237,89 @@ class WeatherService:
             "note": "Sample data - OpenWeatherMap API unavailable"
         }
 
+class CurrencyService:
+    """Currency conversion service using free Exchange Rates API"""
+    
+    def __init__(self):
+        self.base_url = "https://api.exchangerate-api.com/v4/latest"
+        self.cache = {}
+        self.cache_duration = 3600  # 1 hour cache
+        
+    def get_exchange_rate(self, from_currency, to_currency="USD"):
+        """Get exchange rate between two currencies"""
+        cache_key = f"{from_currency}_{to_currency}"
+        current_time = datetime.now()
+        
+        # Check cache first
+        if cache_key in self.cache:
+            cached_data, cached_time = self.cache[cache_key]
+            if (current_time - cached_time).seconds < self.cache_duration:
+                return cached_data
+        
+        try:
+            response = requests.get(f"{self.base_url}/{from_currency}", timeout=10)
+            if response.status_code == 200:
+                data = response.json()
+                rate = data.get('rates', {}).get(to_currency, 1)
+                self.cache[cache_key] = (rate, current_time)
+                return rate
+            else:
+                return 1  # Fallback rate
+        except Exception as e:
+            print(f"Currency API error: {e}")
+            return 1  # Fallback rate
+    
+    def convert_price(self, amount, from_currency, to_currency="USD"):
+        """Convert price from one currency to another"""
+        if from_currency == to_currency:
+            return amount
+        
+        rate = self.get_exchange_rate(from_currency, to_currency)
+        return round(amount * rate, 2)
+    
+    def format_price_with_conversion(self, local_amount, local_currency, destination_country=None):
+        """Format price showing both local and USD equivalent"""
+        if local_currency == "USD":
+            return f"${local_amount}"
+        
+        usd_amount = self.convert_price(local_amount, local_currency, "USD")
+        
+        # Currency symbols mapping
+        symbols = {
+            "EUR": "€", "GBP": "£", "JPY": "¥", "CNY": "¥", 
+            "INR": "₹", "CAD": "C$", "AUD": "A$", "CHF": "CHF",
+            "SEK": "kr", "NOK": "kr", "DKK": "kr", "THB": "฿"
+        }
+        
+        symbol = symbols.get(local_currency, local_currency)
+        return f"{symbol}{local_amount} (~${usd_amount} USD)"
+    
+    def get_country_currency(self, country):
+        """Get the primary currency for a country"""
+        currency_map = {
+            "United States": "USD", "USA": "USD", "US": "USD",
+            "United Kingdom": "GBP", "UK": "GBP", "England": "GBP", "Britain": "GBP",
+            "France": "EUR", "Germany": "EUR", "Italy": "EUR", "Spain": "EUR", 
+            "Netherlands": "EUR", "Austria": "EUR", "Belgium": "EUR", "Portugal": "EUR",
+            "Japan": "JPY", "China": "CNY", "India": "INR", "Canada": "CAD",
+            "Australia": "AUD", "Switzerland": "CHF", "Sweden": "SEK", 
+            "Norway": "NOK", "Denmark": "DKK", "Thailand": "THB",
+            "South Korea": "KRW", "Singapore": "SGD", "Hong Kong": "HKD",
+            "Mexico": "MXN", "Brazil": "BRL", "Russia": "RUB", "Turkey": "TRY"
+        }
+        
+        # Try exact match first
+        if country in currency_map:
+            return currency_map[country]
+        
+        # Try partial matching
+        country_lower = country.lower()
+        for country_name, currency in currency_map.items():
+            if country_lower in country_name.lower() or country_name.lower() in country_lower:
+                return currency
+        
+        return "USD"  # Default fallback
+
 class RoadsService(GoogleAPIService):
     """Google Roads API service"""
     
@@ -305,6 +388,7 @@ class GoogleServicesManager:
 
 # Initialize services
 config = Config()
+currency_service = CurrencyService()
 
 # Initialize Google services with proper error handling
 try:
@@ -661,6 +745,35 @@ def get_static_map():
     except Exception as e:
         return jsonify({'error': f'Static map error: {str(e)}'}), 500
 
+@app.route('/api/currency/<destination>')
+@app.route('/api/currency/<destination>/<base_currency>')
+def get_currency_info(destination, base_currency="USD"):
+    """Get currency information for a destination"""
+    try:
+        # Extract country from destination
+        country = destination.split(',')[-1].strip() if ',' in destination else destination
+        local_currency = currency_service.get_country_currency(country)
+        
+        # Get exchange rate
+        rate = currency_service.get_exchange_rate(base_currency, local_currency)
+        
+        return jsonify({
+            'success': True,
+            'destination': destination,
+            'country': country,
+            'local_currency': local_currency,
+            'base_currency': base_currency,
+            'exchange_rate': rate,
+            'formatted_rate': f"1 {base_currency} = {rate:.2f} {local_currency}",
+            'last_updated': datetime.now().isoformat()
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': f'Currency lookup error: {str(e)}'
+        }), 500
+
 @app.route('/api/generate-itinerary', methods=['POST'])
 def generate_itinerary():
     """Generate travel itinerary using Gemini AI"""
@@ -743,9 +856,12 @@ def generate_itinerary():
         # Clean the itinerary text (remove unwanted markdown characters)
         formatted_itinerary = clean_itinerary_text(itinerary)
         
+        # Enhance with currency information
+        enhanced_itinerary = enhance_itinerary_with_currency(formatted_itinerary, destination)
+        
         return jsonify({
             'success': True,
-            'itinerary': formatted_itinerary,
+            'itinerary': enhanced_itinerary,
             'destination': destination,
             'duration': duration,
             'start_date': start_date,
@@ -761,22 +877,69 @@ def generate_itinerary():
         }), 500
 
 def clean_itinerary_text(text):
-    """Clean itinerary text by removing unwanted markdown characters, following the example.py approach."""
+    """Clean itinerary text by removing unwanted markdown characters while preserving content."""
     import re
     
-    # Remove unwanted characters - same approach as your example.py
-    cleaned_text = re.sub(r'[*\#]', '', text)
+    if not text or text.strip() == '':
+        return ''
     
-    # Remove any double asterisks that might have been used for bold
-    cleaned_text = re.sub(r'\*\*', '', cleaned_text)
+    # More careful cleaning to avoid removing content
+    cleaned_text = text
     
-    # Clean up any extra whitespace that might result from character removal
-    cleaned_text = re.sub(r'\n\s*\n\s*\n', '\n\n', cleaned_text)
+    # Remove markdown headers (# ## ###) but keep the header text
+    cleaned_text = re.sub(r'^#{1,6}\s*', '', cleaned_text, flags=re.MULTILINE)
+    
+    # Remove bold markdown (**text**) but keep the text content
+    cleaned_text = re.sub(r'\*\*([^*]+)\*\*', r'\1', cleaned_text)
+    
+    # Remove remaining single asterisks used for emphasis
+    cleaned_text = re.sub(r'(?<!\*)\*(?!\*)', '', cleaned_text)
+    
+    # Clean up excessive whitespace while preserving paragraph breaks
+    cleaned_text = re.sub(r'\n\s*\n\s*\n+', '\n\n', cleaned_text)
+    
+    # Remove leading/trailing whitespace but preserve structure
+    lines = cleaned_text.split('\n')
+    cleaned_lines = [line.rstrip() for line in lines]
+    cleaned_text = '\n'.join(cleaned_lines)
     
     return cleaned_text.strip()
 
+def enhance_itinerary_with_currency(itinerary_text, destination):
+    """Enhance itinerary text with currency conversion information"""
+    try:
+        # Get currency for destination
+        country = destination.split(',')[-1].strip() if ',' in destination else destination
+        local_currency = currency_service.get_country_currency(country)
+        
+        if local_currency == "USD":
+            return itinerary_text  # No conversion needed
+        
+        # Add currency information header if not already present
+        currency_info = f"\n\nCURRENCY INFORMATION:\n"
+        currency_info += f"Local Currency: {local_currency}\n"
+        currency_info += f"Exchange Rate: 1 USD = {currency_service.get_exchange_rate('USD', local_currency):.2f} {local_currency}\n"
+        currency_info += f"Note: All prices shown as {local_currency} amount (~USD equivalent)\n"
+        
+        # Insert currency info after the first paragraph if not already present
+        if "CURRENCY INFORMATION" not in itinerary_text and "Exchange Rate" not in itinerary_text:
+            lines = itinerary_text.split('\n')
+            insert_index = 3 if len(lines) > 3 else len(lines)
+            lines.insert(insert_index, currency_info)
+            itinerary_text = '\n'.join(lines)
+        
+        return itinerary_text
+        
+    except Exception as e:
+        print(f"Error enhancing currency info: {e}")
+        return itinerary_text
+
 def create_enhanced_itinerary_prompt(destination, start_date, end_date, duration, people, children, budget, lodging, travel_transport, local_transport, interests, special_requests):
     """Create an enhanced prompt with Google API integration"""
+    
+    # Get currency information for the destination
+    country = destination.split(',')[-1].strip() if ',' in destination else destination
+    local_currency = currency_service.get_country_currency(country)
     
     # Convert interests list to readable format
     interests_text = ', '.join(interests) if interests else 'general sightseeing'
@@ -856,13 +1019,22 @@ TRAVELER PREFERENCES:
 - Group size: {people_text}
 - Interests: {interests_text}{budget_context}{lodging_context}{transport_context}{group_context}{special_context}
 
+CURRENCY & PRICING REQUIREMENTS:
+- Local currency for {destination}: {local_currency}
+- ALL prices must be provided in local currency ({local_currency}) with USD conversion in parentheses
+- Format: "{local_currency}100 (~$75 USD)" for local prices
+- Include realistic price ranges for restaurants, attractions, transportation, and activities
+- Consider group size when calculating total costs (multiply individual prices by {people})
+- Mention any group discounts available for attractions or activities
+
 REQUIREMENTS:
 - Provide a day-by-day breakdown (Day 1, Day 2, etc.)
-- Include specific activities, attractions, and experiences with prices for {people_text}
-- Suggest actual restaurant names and local cuisine with seating for {people_text}
+- Include specific activities, attractions, and experiences with prices in {local_currency} and USD conversions for {people_text}
+- Suggest actual restaurant names and local cuisine with menu price ranges in both currencies for {people_text}
 - Include timing recommendations (morning, afternoon, evening)
-- Add transportation tips between locations for {people_text}
+- Add transportation tips between locations with costs in {local_currency} and USD for {people_text}
 - Consider group size when recommending accommodations and dining reservations
+- Include daily budget estimates in both {local_currency} and USD
 
 LOCATION & SAFETY REQUIREMENTS:
 - Provide EXACT FULL ADDRESSES for all attractions, restaurants, and hotels
@@ -893,17 +1065,19 @@ FORMAT & STRUCTURE:
 - Write content continuously without manual separators - the system will add visual dividers automatically
 
 REQUIRED SECTION STRUCTURE:
-1. Day 1 activities and details
-2. Day 2 activities and details (if multi-day)
-3. Additional days as needed
-4. SAFETY INFORMATION (always include this major section)
-5. Cultural Considerations and Local Customs
-6. Money and Document Safety Tips
-7. Emergency Contacts
+1. Day 1 activities and details with pricing in {local_currency} and USD
+2. Day 2 activities and details (if multi-day) with pricing in both currencies
+3. Additional days as needed with consistent pricing format
+4. DAILY BUDGET SUMMARY (estimated total daily costs in {local_currency} and USD)
+5. CURRENCY & PAYMENT INFORMATION (exchange rates, payment methods, tipping customs)
+6. SAFETY INFORMATION (always include this major section)
+7. Cultural Considerations and Local Customs
+8. Money and Document Safety Tips
+9. Emergency Contacts
 
-Write clean, flowing text - visual separators will be added automatically by the system.
+Write clean, flowing text with realistic pricing in both currencies - visual separators will be added automatically by the system.
 
-Please create a comprehensive, well-structured itinerary that maximizes the travel experience while being practical, actionable, and safe."""
+Please create a comprehensive, well-structured itinerary that maximizes the travel experience while being practical, actionable, safe, and budget-conscious with accurate currency conversions."""
 
     return prompt
 
