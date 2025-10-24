@@ -7,24 +7,30 @@
     <title>{% block title %}go.travel - AI-Powered Travel Assistant{% endblock %}</title>
     
     <!-- Meta Tags for SEO and Social -->
-    <meta name="description" content="{% block description %}Create personalized and detailed travel itineraries that accomodate to your needs and preferences. With real-time weather, interactive maps, and recommendations, you'll have the best trip possible!.{% endblock %}">
-    <meta name="keywords" content="travel itinerary, AI travel planner, trip planner, travel guide, vacation planner">
+    <meta name="description" content="{% block description %}Create personalized and detailed travel itineraries with AI-powered recommendations. Get real-time weather, interactive maps, and expert travel guidance for your perfect trip.{% endblock %}">
+    <meta name="keywords" content="{% block keywords %}travel itinerary, AI travel planner, trip planner, travel guide, vacation planner, travel assistant{% endblock %}">
     <meta name="author" content="go.travel">
     <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://gotravel-41611891727.us-central1.run.app{% block canonical_path %}/{% endblock %}">
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://gotravel.com/">
-    <meta property="og:title" content="{% block og_title %}go.travel - AI Travel Assistant{% endblock %}">
-    <meta property="og:description" content="{% block og_description %}Plan your next trip with AI, don't worry about anything but the pictures and fun you'll have!{% endblock %}">
-    <meta property="og:image" content="/gotravel.png">
+    <meta property="og:url" content="https://gotravel-41611891727.us-central1.run.app{% block og_path %}/{% endblock %}">
+    <meta property="og:title" content="{% block og_title %}go.travel - AI-Powered Travel Itinerary Generator{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}Create personalized travel itineraries with AI. Get detailed trip plans with real-time weather, interactive maps, and local recommendations.{% endblock %}">
+    <meta property="og:image" content="https://gotravel-41611891727.us-central1.run.app/gotravel.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:site_name" content="go.travel">
     
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://gotravel.com/">
-    <meta property="twitter:title" content="{% block twitter_title %}go.travel - AI Travel Assistant{% endblock %}">
-    <meta property="twitter:description" content="{% block twitter_description %}Plan your next trip with AI, don't worry about anything but the pictures and fun you'll have!{% endblock %}">
-    <meta property="twitter:image" content="/gotravel.png">
+    <meta property="twitter:url" content="https://gotravel-41611891727.us-central1.run.app{% block twitter_path %}/{% endblock %}">
+    <meta property="twitter:title" content="{% block twitter_title %}go.travel - AI Travel Planner{% endblock %}">
+    <meta property="twitter:description" content="{% block twitter_description %}Plan your perfect trip with AI-powered itineraries, real-time weather, and interactive maps.{% endblock %}">
+    <meta property="twitter:image" content="https://gotravel-41611891727.us-central1.run.app/gotravel.png">
+    <meta property="twitter:site" content="@gotravel">
+    <meta property="twitter:creator" content="@gotravel">
     
     <!-- Favicon -->
     <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
@@ -62,6 +68,41 @@
             });
         };
     </script>
+    
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "go.travel",
+        "description": "AI-powered travel itinerary generator",
+        "url": "https://gotravel-41611891727.us-central1.run.app",
+        "logo": "https://gotravel-41611891727.us-central1.run.app/gotravel.png",
+        "sameAs": [],
+        "contactPoint": {
+            "@type": "ContactPoint",
+            "contactType": "customer service",
+            "availableLanguage": "English"
+        }
+    }
+    </script>
+    
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "go.travel",
+        "url": "https://gotravel-41611891727.us-central1.run.app",
+        "description": "Create personalized travel itineraries with AI-powered recommendations",
+        "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://gotravel-41611891727.us-central1.run.app/planner?destination={search_term_string}",
+            "query-input": "required name=search_term_string"
+        }
+    }
+    </script>
+    
+    {% block structured_data %}{% endblock %}
     
     <style>
         /* CSS Variables */

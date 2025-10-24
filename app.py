@@ -426,6 +426,60 @@ def about():
     """Serve the about page"""
     return render_template('about.html', google_api_key=config.google_api_key)
 
+@app.route('/sitemap.xml')
+def sitemap():
+    """Generate sitemap.xml for SEO"""
+    from flask import Response
+    
+    sitemap_xml = '''<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+        <loc>https://gotravel-41611891727.us-central1.run.app/</loc>
+        <lastmod>{}</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>1.0</priority>
+    </url>
+    <url>
+        <loc>https://gotravel-41611891727.us-central1.run.app/planner</loc>
+        <lastmod>{}</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.9</priority>
+    </url>
+    <url>
+        <loc>https://gotravel-41611891727.us-central1.run.app/explore</loc>
+        <lastmod>{}</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    <url>
+        <loc>https://gotravel-41611891727.us-central1.run.app/about</loc>
+        <lastmod>{}</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+</urlset>'''.format(
+        datetime.now().strftime('%Y-%m-%d'),
+        datetime.now().strftime('%Y-%m-%d'),
+        datetime.now().strftime('%Y-%m-%d'),
+        datetime.now().strftime('%Y-%m-%d')
+    )
+    
+    return Response(sitemap_xml, mimetype='application/xml')
+
+@app.route('/robots.txt')
+def robots():
+    """Generate robots.txt for SEO"""
+    from flask import Response
+    
+    robots_txt = '''User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+
+Sitemap: https://gotravel-41611891727.us-central1.run.app/sitemap.xml'''
+    
+    return Response(robots_txt, mimetype='text/plain')
+
 @app.route('/api/status')
 def api_status():
     """Check the status of all configured APIs"""
