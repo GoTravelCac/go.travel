@@ -801,7 +801,7 @@
     <header class="header">
         <div class="container">
             <h1>go.travel</h1>
-            <p>AI-Powered Travel Itinerary Generator - Create personalized travel plans in seconds</p>
+            <p>AI-Powered Travel Planner - Create personalized travel plans in seconds</p>
             
             <!-- Key Features -->
             <div class="travel-stats">
@@ -859,12 +859,12 @@
                     <div class="feature-card">
                         <div class="feature-icon">🤖</div>
                         <h4>AI-Powered Planning</h4>
-                        <p>Advanced Gemini AI creates personalized itineraries based on your preferences and interests</p>
+                        <p>Advanced Gemini AI creates personalized plans based on your preferences and interests</p>
                     </div>
                     <div class="feature-card">
                         <div class="feature-icon">🌤️</div>
                         <h4>Real-Time Weather</h4>
-                        <p>Get current weather conditions and forecasts to plan your activities perfectly</p>
+                        <p>Get current weather conditions and forecasts to plan your activities perfectly, so you don't have to stress!</p>
                     </div>
                     <div class="feature-card">
                         <div class="feature-icon">📍</div>
@@ -880,6 +880,11 @@
                         <div class="feature-icon">💰</div>
                         <h4>Budget Planning</h4>
                         <p>Customize your trip based on budget preferences from budget-friendly to luxury</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">👮🏻‍♀️</div>
+                        <h4>Safety Management</h4>
+                        <p>Ensure safety everywhere you go, with safety tips and location tracking to reduce stress in unsafe areas.</p>
                     </div>
                     <div class="feature-card">
                         <div class="feature-icon">⚡</div>
@@ -1017,18 +1022,18 @@
                 <div class="form-group">
                     <label for="special-requests">Special Requests (Optional)</label>
                     <textarea id="special-requests" name="specialRequests" rows="3" 
-                              placeholder="Any specific preferences, dietary restrictions, accessibility needs, or special occasions?"></textarea>
+                              placeholder="Any specific preferences, dietary restrictions, accessibility needs, safety preferences, or special occasions?"></textarea>
                 </div>
 
                 <button type="submit" class="generate-btn" id="generateBtn">
-                    🚀 Generate My Itinerary
+                    🚀 Generate My Personalized Plan
                 </button>
             </form>
 
             <!-- Results Section -->
             <div class="results-section" id="resultsSection">
                 <div class="results-header">
-                    <h2>Your Personalized Itinerary</h2>
+                    <h2>Your Personalized Plan</h2>
                     <p class="trip-summary" id="tripSummary"></p>
                 </div>
                 
@@ -1059,7 +1064,7 @@
                 
                 <!-- Itinerary Management Section -->
                 <div id="itinerary-management" class="itinerary-management" style="display: none;">
-                    <h3 style="font-family: 'Dancing Script', cursive; font-size: 1.8rem; color: var(--primary-blue); margin-bottom: 1rem;">✏️ Customize Your Itinerary</h3>
+                    <h3 style="font-family: 'Dancing Script', cursive; font-size: 1.8rem; color: var(--primary-blue); margin-bottom: 1rem;">✏️ Customize Your Plan</h3>
                     
                     <div class="management-grid">
                         <div class="management-card">
@@ -1089,7 +1094,7 @@
             <div class="footer-content">
                 <div class="footer-section">
                     <h4>go.travel</h4>
-                    <p>AI-powered travel planning made simple. Create your perfect itinerary in seconds.</p>
+                    <p>AI-powered travel planning made simple. Create your perfect plan in seconds.</p>
                     <div class="social-links">
                         <span>🌐 Connect with us</span>
                     </div>
@@ -1097,7 +1102,7 @@
                 <div class="footer-section">
                     <h4>Features</h4>
                     <ul>
-                        <li>🤖 AI Itinerary Generation</li>
+                        <li>🤖 Personal Plan Generation</li>
                         <li>🌤️ Real-time Weather</li>
                         <li>📍 Local Recommendations</li>
                         <li>🗺️ Interactive Maps</li>
@@ -1833,7 +1838,7 @@
                     if (data.success) {
                         document.getElementById('itineraryContent').innerHTML = formatItinerary(data.itinerary);
                         document.getElementById('itinerary-changes').value = '';
-                        showMessage('Itinerary updated successfully!', 'success');
+                        showMessage('Travel Plan updated successfully!', 'success');
                     } else {
                         throw new Error(data.error || 'Failed to refine itinerary');
                     }
@@ -1841,8 +1846,8 @@
                     throw new Error('Server error');
                 }
             } catch (error) {
-                console.error('Error refining itinerary:', error);
-                showMessage('Error updating itinerary. Please try again.', 'error');
+                console.error('Error refining plan:', error);
+                showMessage('Error updating plan. Please try again.', 'error');
             }
         }
 

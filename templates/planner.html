@@ -835,12 +835,20 @@
                     <input type="checkbox" id="sports" name="interests" value="sports">
                     <label for="sports">⚽ Sports</label>
                 </div>
+                <div class="interest-item">
+                    <input type="checkbox" id="wellness" name="interests" value="wellness">
+                    <label for="wellness">🧘 Wellness & Relaxation</label>
+                </div>
+                <div class="interest-item">
+                    <input type="checkbox" id="adventure" name="interests" value="adventure">
+                    <label for="adventure">🏔️ Adventure & Outdoors</label>
+                </div>
             </div>
         </div>
 
         <div class="form-group">
             <label for="specialRequests">📝 Special Requests (optional)</label>
-            <textarea id="specialRequests" name="specialRequests" rows="3" placeholder="Any specific requirements, accessibility needs, or special interests..."></textarea>
+            <textarea id="specialRequests" name="specialRequests" rows="3" placeholder="Any specific requirements, accessibility needs, safety preferences, or special interests..."></textarea>
         </div>
 
         <button type="submit" class="generate-btn" id="generateBtn">
@@ -870,7 +878,7 @@
             <div class="management-grid">
                 <div class="management-card">
                     <h4>🔄 Refine Your Itinerary</h4>
-                    <textarea id="itinerary-changes" placeholder="Describe any changes you'd like to make to your itinerary..." rows="4"></textarea>
+                    <textarea id="itinerary-changes" placeholder="Describe any changes you'd like to make to your plan..." rows="4"></textarea>
                     <button class="action-btn primary" onclick="refineItinerary()">Update Itinerary</button>
                 </div>
                 <div class="management-card">

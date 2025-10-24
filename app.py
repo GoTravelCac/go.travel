@@ -1124,14 +1124,30 @@ REQUIRED SECTION STRUCTURE:
 3. Additional days as needed with consistent pricing format
 4. DAILY BUDGET SUMMARY (estimated total daily costs in {local_currency} and USD)
 5. CURRENCY & PAYMENT INFORMATION (exchange rates, payment methods, tipping customs)
-6. SAFETY INFORMATION (always include this major section)
-7. Cultural Considerations and Local Customs
-8. Money and Document Safety Tips
-9. Emergency Contacts
+6. STRESS RELIEF & WELLNESS SECTION (dedicated section for relaxation and mental well-being)
+7. SAFETY INFORMATION (always include this major section)
+8. Cultural Considerations and Local Customs
+9. Money and Document Safety Tips
+10. Emergency Contacts
+
+STRESS RELIEF & WELLNESS REQUIREMENTS:
+- Include a dedicated "STRESS RELIEF & WELLNESS" section after the daily activities
+- Provide specific stress-relief activities and locations in {destination}
+- Include local spas, wellness centers, parks, or meditation spots with addresses and prices
+- Suggest calming activities for each day (morning yoga spots, evening relaxation, etc.)
+- Add breathing exercises, mindfulness tips, and relaxation techniques for travelers
+- Include information about local wellness traditions and practices
+- Recommend quiet spaces for decompression after busy sightseeing days
+- Provide tips for managing travel anxiety and maintaining mental health during the trip
+- Include contact information for wellness services and mental health resources if needed
+- Add suggestions for healthy local foods and hydration tips
+- Mention jet lag management and sleep optimization techniques
 
 Write clean, flowing text with realistic pricing in both currencies - visual separators will be added automatically by the system.
 
-Please create a comprehensive, well-structured itinerary that maximizes the travel experience while being practical, actionable, safe, and budget-conscious with accurate currency conversions."""
+IMPORTANT: Always include a comprehensive "STRESS RELIEF & WELLNESS" section that provides practical relaxation techniques, local wellness resources, and mental health tips for travelers. This section should help travelers manage stress, anxiety, and fatigue during their trip.
+
+Please create a comprehensive, well-structured itinerary that maximizes the travel experience while being practical, actionable, safe, budget-conscious with accurate currency conversions, and supportive of traveler mental health and well-being."""
 
     return prompt
 
