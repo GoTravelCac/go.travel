@@ -519,12 +519,6 @@ def api_status():
     
     return jsonify(status)
 
-# Legacy route for backwards compatibility
-@app.route('/index')
-def index():
-    """Redirect to planner for backwards compatibility"""
-    return render_template('index.html', google_api_key=config.google_api_key)
-
 # Static file routes
 @app.route('/gotravel.png')
 def logo():
