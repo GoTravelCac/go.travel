@@ -907,6 +907,43 @@ let autocomplete;
 let currentItinerary = '';
 let currentDestination = '';
 
+// Utility function for safe URL parameter handling
+function getDestinationFromURL() {
+    try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const destination = urlParams.get('destination');
+        
+        if (!destination) return null;
+        
+        // Try to decode the parameter, handling various encoding scenarios
+        let decodedDestination = destination;
+        
+        // If it's already encoded, decode it
+        if (destination.includes('%')) {
+            try {
+                decodedDestination = decodeURIComponent(destination);
+            } catch (e) {
+                console.warn('Could not decode destination parameter:', e);
+                decodedDestination = destination;
+            }
+        }
+        
+        // Clean up the destination string
+        decodedDestination = decodedDestination.trim();
+        
+        // Validate that the destination is not empty after processing
+        if (decodedDestination.length === 0) {
+            console.warn('Destination parameter is empty after processing');
+            return null;
+        }
+        
+        return decodedDestination;
+    } catch (error) {
+        console.error('Error processing URL parameters:', error);
+        return null;
+    }
+}
+
 // Initialize page when Google Maps API is ready
 function initializePage() {
     // Wait for DOM to be ready
@@ -924,13 +961,13 @@ function initializeComponents() {
     setupDateCalculation();
     
     // Check if destination is pre-filled from URL params
-    const urlParams = new URLSearchParams(window.location.search);
-    const destination = urlParams.get('destination');
+    const destination = getDestinationFromURL();
     if (destination) {
         const destinationInput = document.getElementById('destination');
         if (destinationInput) {
             destinationInput.value = destination;
             loadLocationInfo(destination);
+            console.log('Successfully loaded destination from URL:', destination);
         }
     }
 }
